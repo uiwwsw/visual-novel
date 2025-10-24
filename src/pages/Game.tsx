@@ -1,4 +1,5 @@
 import { CSSProperties, useEffect, useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import Sentence, { SentenceProps } from '@/Sentence';
 import { getJson } from '#/getJson';
 import useDebounce from '#/useDebounce';
@@ -94,17 +95,35 @@ const Game = () => {
     <Preload assets={assetList}>
       <div onClick={nextScene} className="absolute inset-0">
         {place && assets[place]?.audio && <audio src={assets[place]?.audio} autoPlay />}
-        {character && (
-          <img
-            className="absolute bottom-0 z-10 w-1/2"
-            style={characterPosition}
-            src={assets[character]?.image}
-            alt={character}
-          />
-        )}
-        {place && assets[place]?.image && (
-          <img className="absolute h-full w-full object-cover" src={assets[place]?.image} alt={place} />
-        )}
+        <AnimatePresence mode="wait">
+          {character && assets[character]?.image && (
+            <motion.img
+              key={character}
+              className="absolute bottom-0 z-10 w-1/2"
+              style={characterPosition}
+              src={assets[character]?.image}
+              alt={character}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+            />
+          )}
+        </AnimatePresence>
+        <AnimatePresence mode="wait">
+          {place && assets[place]?.image && (
+            <motion.img
+              key={place}
+              className="absolute h-full w-full object-cover"
+              src={assets[place]?.image}
+              alt={place}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.45, ease: 'easeOut' }}
+            />
+          )}
+        </AnimatePresence>
         {sentence && (
           <div
             className="absolute inset-0 top-auto z-20 flex gap-2 border-t bg-white bg-opacity-75 p-2 text-black"

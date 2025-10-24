@@ -1,7 +1,7 @@
 // import reactLogo from './assets/react.svg';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Assets } from '@/Game';
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 // import viteLogo from '/vite.svg';
 interface Sentence {
@@ -87,23 +87,29 @@ const Sentence = ({ assets, data, isComplete: isCompleteProp, onComplete }: Sent
   }, [isComplete]);
   return (
     <>
-      {assets &&
-        assetArray &&
-        assetArray.map((x, i, arr) => (
-          <Fragment key={i}>
-            {assets[x].audio && <audio src={assets[x].audio} autoPlay />}
-            {assets[x].image && (
-              <motion.img
-                className="fixed left-1/2 top-1/2 max-h-40 max-w-40 -translate-x-1/2 -translate-y-1/2 object-contain transition-all"
-                style={{ marginLeft: marginLeft(i, arr) }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                src={assets[x].image}
-              />
+      {assets && assetArray && (
+        <>
+          {assetArray.map(
+            (x, i) => assets[x].audio && <audio key={`${x}-audio-${i}`} src={assets[x].audio} autoPlay />,
+          )}
+          <AnimatePresence>
+            {assetArray.map((x, i, arr) =>
+              assets[x].image ? (
+                <motion.img
+                  key={`${x}-image-${i}`}
+                  className="fixed left-1/2 top-1/2 max-h-40 max-w-40 -translate-x-1/2 -translate-y-1/2 object-contain transition-all"
+                  style={{ marginLeft: marginLeft(i, arr) }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  src={assets[x].image}
+                />
+              ) : null,
             )}
-          </Fragment>
-        ))}
+          </AnimatePresence>
+        </>
+      )}
       <p className="relative flex-auto whitespace-pre-line">
         {sentences}
         {isComplete ? (
