@@ -6,11 +6,11 @@ import LoadBtn from '@/LoadBtn';
 import Assets from '@/Preload';
 import { useEffect, useMemo, useState } from 'react';
 import { getJson } from '#/getJson';
-import { Asset } from './Game';
+import type { Asset } from '@/types/assets';
 const StartMenuPage = () => {
   const { addStorage } = useStorageContext();
   const [asset, setAsset] = useState<Asset>({});
-  const assets = useMemo(() => Object.values(asset), [asset]);
+  const assets = useMemo(() => Object.values(asset).filter((value): value is string => Boolean(value)), [asset]);
   const handleStart = () => {
     addStorage({ page: 'game', level: 0 });
   };

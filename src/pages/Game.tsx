@@ -3,13 +3,7 @@ import Sentence, { SentenceProps } from '@/Sentence';
 import { getJson } from '#/getJson';
 import Preload from '@/Preload';
 import { useStorageContext } from '@/StorageContext';
-export interface Asset {
-  image?: string;
-  audio?: string;
-}
-export type Assets = {
-  [key: string]: Asset;
-};
+import type { Assets } from '@/types/assets';
 interface Chapter {
   changePosition?: true;
   sentences: SentenceProps['data'][];

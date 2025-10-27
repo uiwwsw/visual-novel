@@ -1,156 +1,166 @@
-// import reactLogo from './assets/react.svg';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Assets } from '@/Game';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { MouseEvent, useMemo, useState } from 'react';
+import type { Assets } from '@/types/assets';
+import { calculateAssetOffset, getVisibleAssetEntries } from '#/assetLayout';
+import { useTypewriter } from '#/useTypewriter';
+import type { RawSentence } from '#/typewriter';
 
-// import viteLogo from '/vite.svg';
-interface Sentence {
-  duration?: number;
-  message: string;
-  asset?: string | string[];
-}
-interface AssetEntry {
-  name: string;
-  index: number;
-  key: string;
-}
 export interface SentenceProps {
   assets?: Assets;
-  data?: string | Sentence | Sentence[];
+  data?: string | RawSentence | RawSentence[];
   direct?: boolean;
   isComplete: boolean;
   onComplete: () => void;
 }
-const defaultDuration = 100;
-const Sentence = ({ assets, data, direct, isComplete: isCompleteProp, onComplete }: SentenceProps) => {
-  const [_sentences, setSentences] = useState<Sentence[]>([]);
-  const [_cursor, setCursor] = useState<number>(0);
-  const [_step, setStep] = useState<number>(-1);
 
-  const step = useMemo(() => Math.min(_step, _sentences.length), [_step, _sentences]);
+const speedPresets = [
+  { id: 'slow', label: '느림', multiplier: 1.5 },
+  { id: 'normal', label: '보통', multiplier: 1 },
+  { id: 'fast', label: '빠름', multiplier: 0.6 },
+] as const;
 
-  const isComplete = useMemo(() => {
-    if (_cursor === 0) return false;
-    return _sentences.length <= _step;
-  }, [_sentences, _step]);
+type SpeedPresetId = (typeof speedPresets)[number]['id'];
 
-  const cursor = useMemo(
-    () => (isCompleteProp || isComplete ? Infinity : _cursor),
-    [_sentences, _cursor, isCompleteProp],
-  );
+const SentenceAssets = ({
+  assets,
+  direct,
+  entries,
+}: {
+  assets?: Assets;
+  direct?: boolean;
+  entries: ReturnType<typeof getVisibleAssetEntries>;
+}) => {
+  if (!assets || entries.length === 0) return null;
 
-  const sentence = useMemo(() => _sentences[step] ?? { message: '', duration: 0 }, [_sentences, step]);
-  const sentences = useMemo(() => {
-    let msg = '';
-    for (const index in _sentences) {
-      if (!isCompleteProp && step < +index) break;
-      if (step === +index) msg += _sentences[index].message.substring(0, cursor);
-      else msg += _sentences[index].message;
-    }
-
-    return msg;
-  }, [_sentences, cursor, step, isCompleteProp]);
-  const duration = useMemo(() => sentence.duration ?? defaultDuration, [_sentences, step]);
-  // const asset = useMemo(() => sentence.asset, [_sentences, step]);
-  const assetArray = useMemo<AssetEntry[]>(() => {
-    const entries = _sentences.flatMap((sentence, index) => {
-      if (!sentence.asset) return [];
-      const assetNames = Array.isArray(sentence.asset) ? sentence.asset : [sentence.asset];
-      return assetNames.map((name, assetIndex) => ({ name, index, key: `${index}-${assetIndex}-${name}` }));
-    });
-
-    if (isCompleteProp) return entries;
-
-    const currentIndex = Math.min(Math.max(step, 0), _sentences.length - 1);
-    return entries.filter((entry) => entry.index === currentIndex);
-  }, [_sentences, step, isCompleteProp]);
-  const isEndCursor = useMemo(() => sentence.message.length <= cursor, [_sentences, step, cursor]);
-  const marginLeft = useCallback(
-    (index: number, arr: AssetEntry[]) => {
-      if (!assets) return 0;
-      const audioLength = arr.slice(index).filter((entry) => assets[entry.name]?.audio).length;
-      const baseOffset = (index - (arr.length - 1) + audioLength) * -100;
-      return direct ? baseOffset * -1 : baseOffset;
-    },
-    [assets, direct],
-  );
-  useEffect(() => {
-    if (!data) return;
-    if (data instanceof Array) setSentences(data);
-    else if (data instanceof Object) setSentences([data]);
-    else setSentences([{ message: data, duration: defaultDuration }]);
-    setStep(0);
-  }, [data]);
-  useEffect(() => {
-    if (!duration || isComplete) return;
-    setCursor(0);
-    const sti = setInterval(() => setCursor((prev) => prev + 1), duration);
-    return () => clearInterval(sti);
-  }, [_sentences, step, isComplete]);
-
-  useEffect(() => {
-    if (isEndCursor) setStep(step + 1);
-  }, [isEndCursor]);
-  useEffect(() => {
-    if (isComplete) onComplete();
-  }, [isComplete]);
   return (
     <>
-      {assets && assetArray && (
-        <>
-          {assetArray.map(({ name, key }) => {
-            const asset = assets[name];
-            if (!asset?.audio) return null;
-            return <audio key={`audio-${key}`} src={asset.audio} autoPlay />;
-          })}
-          <AnimatePresence initial={false}>
-            {assetArray.map(({ name, key }, i, arr) => {
-              const asset = assets[name];
-              if (!asset?.image) return null;
-              const offset = marginLeft(i, arr);
-              const initialOffset = direct ? offset + 20 : offset - 20;
-              return (
-                <motion.img
-                  key={`image-${key}`}
-                  className={`fixed top-1/2 max-h-40 max-w-40 transform object-contain ${direct ? 'right-1/2' : 'left-1/2'}`}
-                  src={asset.image}
-                  alt=""
-                  initial={{ opacity: 0, scale: 0.95, x: initialOffset }}
-                  animate={{ opacity: 1, scale: 1, x: offset }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{
-                    opacity: { duration: 0.25, ease: 'easeOut' },
-                    scale: { duration: 0.4, ease: 'easeOut' },
-                    x: { type: 'spring', stiffness: 260, damping: 26 },
-                  }}
-                />
-              );
-            })}
-          </AnimatePresence>
-        </>
-      )}
-      <p className="relative flex-auto whitespace-pre-line">
-        {sentences}
-        {isComplete ? (
-          <span className="ml-auto block w-fit animate-pulse">
+      {entries.map(({ name, key }) => {
+        const asset = assets[name];
+        if (!asset?.audio) return null;
+        return <audio key={`audio-${key}`} src={asset.audio} autoPlay />;
+      })}
+      <AnimatePresence initial={false}>
+        {entries.map(({ name, key }, index, arr) => {
+          const asset = assets[name];
+          if (!asset?.image) return null;
+          const offset = calculateAssetOffset(arr, index, assets, direct);
+          const initialOffset = direct ? offset + 24 : offset - 24;
+
+          return (
+            <motion.img
+              key={`image-${key}`}
+              className={`pointer-events-none fixed top-1/2 -translate-y-1/2 transform object-contain drop-shadow-lg ${
+                direct ? 'right-[12%]' : 'left-[12%]'
+              } max-h-40 w-auto max-w-[45vw] sm:max-h-56 sm:max-w-[35vw] md:max-h-64`}
+              src={asset.image}
+              alt=""
+              initial={{ opacity: 0, scale: 0.9, x: initialOffset }}
+              animate={{ opacity: 1, scale: 1, x: offset }}
+              exit={{ opacity: 0, scale: 0.92 }}
+              transition={{
+                opacity: { duration: 0.25, ease: 'easeOut' },
+                scale: { duration: 0.3, ease: 'easeOut' },
+                x: { type: 'spring', stiffness: 240, damping: 26 },
+              }}
+            />
+          );
+        })}
+      </AnimatePresence>
+    </>
+  );
+};
+
+const Sentence = ({ assets, data, direct, isComplete: isCompleteProp, onComplete }: SentenceProps) => {
+  const [speed, setSpeed] = useState<SpeedPresetId>('normal');
+  const speedMultiplier = useMemo(
+    () => speedPresets.find((preset) => preset.id === speed)?.multiplier ?? 1,
+    [speed],
+  );
+
+  const {
+    activeIndex,
+    assets: assetEntries,
+    displayText,
+    internalComplete,
+    intervalDuration,
+    isTyping,
+    sentenceCount,
+    skip,
+  } = useTypewriter({
+    data,
+    isExternallyComplete: isCompleteProp,
+    onComplete,
+    speedMultiplier,
+  });
+
+  const showAll = isCompleteProp || internalComplete;
+  const visibleAssets = useMemo(
+    () => getVisibleAssetEntries(assetEntries, activeIndex, showAll, sentenceCount),
+    [assetEntries, activeIndex, showAll, sentenceCount],
+  );
+  const handleSkip = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (showAll) return;
+    skip();
+  };
+
+  const handleSpeedChange = (event: MouseEvent<HTMLButtonElement>, preset: SpeedPresetId) => {
+    event.stopPropagation();
+    setSpeed(preset);
+  };
+
+  return (
+    <div className="relative flex flex-1 flex-col gap-1">
+      <SentenceAssets assets={assets} direct={direct} entries={visibleAssets} />
+      <p className="relative flex-1 whitespace-pre-line text-sm leading-relaxed sm:text-base">
+        {displayText}
+        {showAll ? (
+          <span className="ml-2 inline-block w-fit animate-pulse align-middle text-base">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth="1.5"
               stroke="currentColor"
-              className="h-6 w-6"
+              className="h-5 w-5"
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="m15 15 6-6m0 0-6-6m6 6H9a6 6 0 0 0 0 12h3" />
             </svg>
           </span>
-        ) : (
-          <span className="animate-ping" style={{ animationDuration: `${duration}ms` }}>
+        ) : isTyping ? (
+          <span className="ml-1 inline-block animate-pulse align-baseline" style={{ animationDuration: `${intervalDuration}ms` }}>
             |
           </span>
-        )}
+        ) : null}
       </p>
-    </>
+      <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-[0.7rem] text-black/70 sm:text-xs">
+        <div className="flex items-center gap-1">
+          <span className="font-semibold">타이핑 속도</span>
+          {speedPresets.map((preset) => (
+            <button
+              key={preset.id}
+              type="button"
+              className={`rounded px-2 py-0.5 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 ${
+                preset.id === speed
+                  ? 'bg-black/80 text-white focus-visible:ring-black'
+                  : 'bg-black/10 hover:bg-black/20 focus-visible:ring-black/40'
+              }`}
+              onClick={(event) => handleSpeedChange(event, preset.id)}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={handleSkip}
+          disabled={showAll}
+          className="rounded border border-black/20 px-2 py-0.5 font-medium text-black transition hover:bg-black/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-black/50 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          전체 보기
+        </button>
+      </div>
+    </div>
   );
 };
 

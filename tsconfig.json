@@ -22,9 +22,15 @@
     "paths": {
       "$/*": ["./src/assets/*"],
       "!/*": ["./src/libs/*"],
-      "@/*": ["./src/components/*", "./src/pages/*", "./src/layouts/*"],
+      "@/*": [
+        "./src/components/*",
+        "./src/pages/*",
+        "./src/layouts/*",
+        "./src/types",
+        "./src/types/*"
+      ],
       "#/*": ["./src/utils/*"],
-      "src/*": ["./src/*"],
+      "src/*": ["./src/*"]
     },
   },
   "include": ["src"],
