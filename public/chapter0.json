@@ -1,605 +1,10 @@
 [
   {
-    "place": "디지털 심연",
+    "place": "캠퍼스 지하 스튜디오",
     "sentences": [
       [
         {
-          "message": "[장면: 어둡고 정지된 공간. 공중에 코드 조각들이 떠다니며 깜빡인다. 모니터 빛이 파편처럼 반짝임.]",
-          "duration": 180
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(숨을 내쉬며) …여긴… 어디야?",
-          "asset": "emoji-relaxed",
-          "duration": 185
-        },
-        {
-          "message": "이 익숙한 전류 냄새… 오래된 서버의 공기 같아.",
-          "asset": "emoji-gear",
-          "duration": 110
-        }
-      ],
-      [
-        {
-          "message": "(주위를 둘러보며) 코드 조각들이 떠다니고 있어. 마치… 나한테 무언가를 속삭이는 것처럼.",
-          "asset": "emoji-gear",
-          "duration": 110
-        }
-      ]
-    ]
-  },
-  {
-    "place": "디지털 심연",
-    "sentences": [
-      [
-        {
-          "message": "(희미한 속삭임이 감긴다) \"매튜… 매튜?\"",
-          "asset": "emoji-speech",
-          "duration": 120
-        }
-      ],
-      {
-        "prompt": "속삭이는 목소리에 어떻게 반응할까?",
-        "choices": [
-          {
-            "text": "눈을 뜨고 대답한다",
-            "goTo": {
-              "id": "respond-call"
-            }
-          },
-          {
-            "text": "조금 더 기다린다",
-            "goTo": {
-              "id": "wait-call"
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "respond-call",
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(눈꺼풀을 떨며) …여기 있어. 누구야, 날 부르는 건?",
-          "asset": "emoji-surprised",
-          "duration": 120
-        }
-      ]
-    ],
-    "next": {
-      "id": "call-merge"
-    }
-  },
-  {
-    "id": "wait-call",
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(숨을 고르며) 아직… 조금만 더. 이건… 꿈인가?",
-          "asset": "emoji-relaxed",
-          "duration": 130
-        }
-      ]
-    ],
-    "next": {
-      "id": "call-merge"
-    }
-  },
-  {
-    "id": "call-merge",
-    "sentences": [
-      [
-        {
-          "message": "(어둠 속에서 목소리가 울린다) \"Syntax Error. 불완전한 호출입니다.\"",
-          "asset": "emoji-speech",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(놀라며) …누구야?! 보여라!",
-          "asset": "emoji-surprised",
-          "duration": 60
-        },
-        {
-          "message": "네가 뭔데 내 코드를 건드리는 거야!",
-          "asset": "emoji-bolt",
-          "duration": 60
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "나는 네 코드가 만든 잔상, 너의 완벽을 향한 욕망이 낳은 그림자.",
-          "asset": "emoji-speech",
-          "duration": 100
-        },
-        {
-          "message": "이름은… 그리드(Grit).",
-          "asset": "emoji-star",
-          "duration": 130
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "그리드… 그래, 네 목소리… 기억나.",
-          "asset": "emoji-surprised",
-          "duration": 110
-        },
-        {
-          "message": "너, 내가 3년 전 버린 실험체지.",
-          "asset": "emoji-bolt",
-          "duration": 65
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "버린 게 아니야. 네가 나를 ‘종료’하지 못했을 뿐이지.",
-          "asset": "emoji-fire",
-          "duration": 65
-        },
-        {
-          "message": "그때 넌 ‘시간이 없었다’고 말했잖아.",
-          "asset": "emoji-speech",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "시간은 언제나 없었지.",
-          "asset": "emoji-sunrise",
-          "duration": 125
-        },
-        {
-          "message": "그리고 후회는 늘 남았고.",
-          "asset": "emoji-leaf",
-          "duration": 125
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "후회라니. 넌 그걸 ‘성장’이라 부르지 않았나?",
-          "duration": 95
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(고개를 숙이며) 그땐 그렇게 믿고 싶었어. 하지만 지금은 알아. 나는 완벽을 향한 욕망에 중독되어 있었단 걸.",
-          "asset": "emoji-leaf",
-          "duration": 130
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "(하얀 빛과 함께 세라가 나타난다)",
-          "asset": "emoji-sparkle",
-          "duration": 155
-        }
-      ]
-    ]
-  },
-  {
-    "character": "세라",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(살짝 웃으며) 드디어 왔네, 매튜. 이 나라가 널 기다리고 있었어.",
-          "asset": "emoji-smile",
-          "duration": 120
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "세라… 넌 아직 여기에 있었구나. UI 마법의 나라를 떠난 줄 알았는데.",
-          "duration": 120
-        }
-      ]
-    ]
-  },
-  {
-    "character": "세라",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(손끝으로 공중의 코드 조각을 매만지며) 나는 사라지지 않아.",
-          "asset": "emoji-gear",
-          "duration": 90
-        },
-        {
-          "message": "너의 디자인, 너의 감성, 네가 사랑했던 ‘화면’의 기억으로 남아 있지.",
-          "asset": "emoji-sparkle",
-          "duration": 125
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(쓴웃음) 그때 네가 말했잖아. \"매튜, 사람은 코드보다 불완전해야 아름다워.\" 근데 난 그 말을 무시했어.",
-          "asset": "emoji-smile",
-          "duration": 140
-        }
-      ]
-    ]
-  },
-  {
-    "character": "세라",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(눈을 반짝이며) 그래서 지금 여기 있는 거야. 너의 불완전함 속으로 돌아왔잖아.",
-          "asset": "emoji-star",
-          "duration": 95
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "(뒤쪽에서 금속음이 나며 루크가 등장한다)",
-          "asset": "emoji-rocket",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "루크",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "…이봐, 추억팔이 그만하고 일이나 하지 그래? 서버가 지금도 타고 있다고.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "루크! 네가 여길 어떻게—",
-          "duration": 85
-        }
-      ]
-    ]
-  },
-  {
-    "character": "루크",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(한숨) 내가 안 올 리 없잖아. 넌 항상 사고를 치고, 나는 그걸 뒤치다꺼리하지.",
-          "asset": "emoji-relaxed",
-          "duration": 140
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(미소) 역시 넌 변하지 않았군. 늘 현실적이야.",
-          "asset": "emoji-smile",
-          "duration": 135
-        }
-      ]
-    ]
-  },
-  {
-    "character": "루크",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "현실은 누군가 붙잡아야 굴러가. 너처럼 이상만 좇는 놈이 있으면 나 같은 사람이 하나쯤은 필요하지.",
-          "duration": 120
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(고개를 끄덕이며) 알아, 루크. 그런데 이번엔 네가 어떻게 생각하느냐에 따라 길이 달라질지도 몰라.",
-          "duration": 130
-        }
-      ],
-      {
-        "prompt": "루크에게 어떻게 설득할까?",
-        "choices": [
-          {
-            "text": "진심을 담아 차분하게 설명한다",
-            "goTo": {
-              "id": "calm-response"
-            }
-          },
-          {
-            "text": "가볍게 농담을 던지며 분위기를 누그러뜨린다",
-            "goTo": {
-              "id": "light-response"
-            }
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "calm-response",
-    "character": "루크",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(잠시 침묵하다가) 네가 그 정도로 말하니 한번 믿어봐야겠군. 그래, 네 계획대로 해보자.",
-          "duration": 135
-        }
-      ]
-    ],
-    "next": {
-      "id": "shared-path"
-    }
-  },
-  {
-    "id": "light-response",
-    "character": "루크",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(입꼬리를 올리며) 네 농담은 늘 날 놀래키지. 그래도… 그런 여유, 싫진 않아.",
-          "duration": 140
-        }
-      ],
-      [
-        {
-          "message": "(웃음을 삭이며) 좋아, 이번엔 네 감으로 가보자. 대신 말아먹으면 너 책임이다?",
-          "duration": 145
-        }
-      ]
-    ],
-    "next": {
-      "id": "shared-path"
-    }
-  },
-  {
-    "id": "shared-path",
-    "character": "세라",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(팔짱을 끼며) 둘이 만나면 늘 이 모양이지. 코드보다 대사가 더 길어.",
-          "asset": "emoji-muscle",
-          "duration": 80
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(웃으며) 대사도 결국, 코드의 일부야.",
-          "asset": "emoji-smile",
-          "duration": 120
-        }
-      ],
-      {
-        "prompt": "이 분위기를 어떻게 정리할까?",
-        "choices": [
-          {
-            "text": "가벼운 농담으로 모두를 웃게 한다"
-          },
-          {
-            "text": "진지하게 앞으로의 계획을 정리한다"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "character": "루크",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(피식 웃음) 그래, 철학자 양반. 그럼 이 상황을 설명해봐. 지금 우리를 둘러싼 이 코드들, 너의 기억이 만든 건가, 아니면 이 세계가 우리를 기억하는 건가?",
-          "asset": "emoji-smile",
-          "duration": 135
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "…둘 다일지도 몰라. 기억은 저장된 게 아니라 실행되는 거니까.",
-          "duration": 120
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "(빛이 깜빡이며 엘리가 등장한다)",
-          "asset": "emoji-sparkle",
-          "duration": 155
-        }
-      ]
-    ]
-  },
-  {
-    "character": "엘리",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "멋진 말이군. 기억은 실행된다. 그렇다면 이 세계는 아직 죽지 않았다는 뜻이겠지.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "엘리… 언제나 냉정하고, 정확하지. 넌 내 코드의 ‘균형’이었어.",
-          "duration": 120
-        }
-      ]
-    ]
-  },
-  {
-    "character": "엘리",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "넌 언제나 혼돈이었고. 그래서 우리가 팀이었지.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "세라",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(웃으며) 균형과 혼돈의 공존이라… 정말 RPG 파티 같다.",
-          "asset": "emoji-smile",
-          "duration": 130
-        }
-      ]
-    ]
-  },
-  {
-    "character": "루크",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "그럼 난 뭐냐? ‘현실 버퍼’ 정도?",
-          "duration": 90
-        }
-      ]
-    ]
-  },
-  {
-    "character": "엘리",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "정확히는 ‘에러 핸들러’지.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "루크",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "(한숨) …칭찬으로 들리지 않는데.",
-          "asset": "emoji-relaxed",
+          "message": "[장면: 해가 지고, 건축과 스튜디오에 깔린 트레이싱 페이퍼와 노트북 불빛.]",
           "duration": 160
         }
       ]
@@ -607,222 +12,108 @@
   },
   {
     "character": "매튜",
-    "place": "잊혀진 코드의 나라",
+    "place": "건축 설계 테이블",
     "sentences": [
       [
         {
-          "message": "(고개를 들며) 좋아. 이제 다 모였군. 그리드, 이제 네가 만든 이 나라를 되찾겠다.",
-          "asset": "emoji-rocket",
-          "duration": 70
+          "message": "(혼잣말) 건축학도로 출발했지만… 머릿속은 이미 코드로 가득해.",
+          "duration": 150
+        }
+      ],
+      [
+        {
+          "message": "도면 대신 함수로 구조를 짜면 어떨까?", "duration": 120
+        }
+      ]
+    ]
+  },
+  {
+    "character": "튜터",
+    "place": "캠퍼스 지하 스튜디오",
+    "sentences": [
+      [
+        {
+          "message": "매튜, 설계 제출은 준비됐나?", "duration": 100
+        }
+      ]
+    ]
+  },
+  {
+    "sentences": [
+      [
+        {
+          "message": "(모니터 위 HUD) \"전직 전환 시뮬레이터 온라인.\"", "duration": 130
+        }
+      ],
+      [
+        {
+          "message": "(툭) 낯선 UI가 떠올라 선택지를 제시한다.", "duration": 110
         }
       ],
       {
-        "prompt": "팀에게 어떤 다짐을 전할까?",
+        "prompt": "스스로를 어떤 개발자로 리부트할까?",
         "choices": [
           {
-            "text": "구체적인 작전 계획을 손짓으로 그리며 설명한다"
+            "text": "설계를 리팩터링하는 프로그래머",
+            "goTo": {
+              "id": "architect-path"
+            }
           },
           {
-            "text": "각자의 불안을 인정하며 공감과 신뢰를 강조한다"
-          },
-          {
-            "text": "과거 함께했던 승리를 상기시키며 기세를 끌어올린다"
+            "text": "새로운 현장으로 뛰어드는 탐험가",
+            "goTo": {
+              "id": "explorer-path"
+            }
           }
         ]
       }
     ]
   },
   {
-    "character": "그리드",
-    "place": "잊혀진 코드의 나라",
-    "sentences": [
-      [
-        {
-          "message": "되찾는다고? 이건 너의 손으로 만든 나라야. 지워야 할 건 ‘타인’이 아니라, ‘너 자신’이야.",
-          "duration": 115
-        }
-      ]
-    ]
-  },
-  {
+    "id": "architect-path",
     "character": "매튜",
-    "place": "잊혀진 코드의 나라",
+    "place": "건축 설계 테이블",
     "sentences": [
       [
         {
-          "message": "(조용히 웃으며) 그럼 지워볼까. `Refactor Storm.`",
-          "asset": "emoji-smile",
-          "duration": 135
+          "message": "(웃으며) 구조 계산은 그대로 두고, 코드로 구현하면 되겠지!",
+          "duration": 140
         }
       ]
-    ]
+    ],
+    "next": {
+      "id": "decision-merge"
+    }
   },
   {
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "(거대한 파란빛 회오리가 솟구치고, 공중의 코드들이 하나씩 정렬되며 흐름을 되찾는다)",
-          "asset": "emoji-bolt",
-          "duration": 95
-        }
-      ]
-    ]
-  },
-  {
-    "character": "세라",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "와… 코드가… 살아 움직여. UI가 자동으로 패턴을 잡고 있어.",
-          "duration": 135
-        }
-      ]
-    ]
-  },
-  {
-    "character": "엘리",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "이건 단순한 리팩토링이 아니야. 재구성, 재정의… 완전히 다른 언어야.",
-          "duration": 120
-        }
-      ]
-    ]
-  },
-  {
-    "character": "루크",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "(감탄하며) 넌 여전히 미쳤군. 하지만… 존경스럽다.",
-          "asset": "emoji-star",
-          "duration": 130
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "(조용히 웃으며) 그 불꽃… 여전히 타오르고 있구나. 하지만 조심해라, 매튜. 불은 빛을 주지만, 그 빛은 언제나 대가를 요구하지.",
-          "asset": "emoji-smile",
-          "duration": 175
-        }
-      ]
-    ]
-  },
-  {
+    "id": "explorer-path",
     "character": "매튜",
-    "place": "Refactor Core",
+    "place": "캠퍼스 지하 스튜디오",
     "sentences": [
       [
         {
-          "message": "(조용히 눈을 감으며) 그래, 알고 있어. 하지만 이번엔, 타버리지 않을 만큼의 불만 켜둘 거야.",
-          "asset": "emoji-sunrise",
+          "message": "(주먹을 쥐며) 좋아, 건축에서 배운 공간감으로 디지털 월드를 디자인한다!",
+          "duration": 150
+        }
+      ]
+    ],
+    "next": {
+      "id": "decision-merge"
+    }
+  },
+  {
+    "id": "decision-merge",
+    "sentences": [
+      [
+        {
+          "message": "[시스템 로그] 이력서 초기화 중… 기반 스킬: 구조적 사고, 디테일 집착, 야근 내성.",
           "duration": 160
         }
-      ]
-    ]
-  },
-  {
-    "character": "세라",
-    "place": "Refactor Core",
-    "sentences": [
+      ],
       [
         {
-          "message": "(미소 지으며) 그 말, 예전에 들었을 때보다 진짜 같네.",
-          "asset": "emoji-smile",
-          "duration": 135
-        }
-      ]
-    ]
-  },
-  {
-    "character": "루크",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "그럼 이번엔 믿어줄까. 단, 또 서버를 태우면… 내가 널 태운다.",
-          "duration": 120
-        }
-      ]
-    ]
-  },
-  {
-    "character": "엘리",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "(잔잔히 웃으며) 좋아. 이제 첫 단계는 끝났군. 다음은… 기억의 루프를 끊는 일이겠지.",
-          "asset": "emoji-smile",
-          "duration": 155
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "그래. 이건 시작에 불과해. 코드의 끝에서, 다시 인간을 찾는 여정.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "(조용히 사라지며) 그럼, 나도 기다리마. 너의 다음 리빌드가… 실패하지 않기를.",
-          "asset": "emoji-sunrise",
-          "duration": 160
-        }
-      ]
-    ]
-  },
-  {
-    "place": "디지털 심연",
-    "sentences": [
-      [
-        {
-          "message": "(빛이 점점 사라지고, 배경이 어두워진다)",
-          "asset": "emoji-sparkle",
-          "duration": 155
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "CHAPTER 1 END",
-          "duration": 90
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "\"완벽함을 버리자, 진짜 창조가 시작되었다.\" — 매튜, 〈Refactor Log 001〉",
-          "duration": 100
+          "message": "자, 첫 번째 모험지는 ‘아메바’다. 속도를 증명할 시간.",
+          "duration": 140
         }
       ]
     ]

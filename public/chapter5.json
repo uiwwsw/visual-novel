@@ -1,10 +1,23 @@
 [
   {
+    "place": "웨이커-세미티에스-파운트 멀티 버스",
     "sentences": [
       [
         {
-          "message": "⚔️ CHAPTER 6 — 그리드와의 대면 (The Final Refactor)",
-          "duration": 90
+          "message": "[장면: 세 개의 포털이 번갈아 열리고, 각기 다른 회사 로고가 반짝인다.]",
+          "duration": 170
+        }
+      ]
+    ]
+  },
+  {
+    "character": "내면의 매튜",
+    "place": "멀티 버스",
+    "sentences": [
+      [
+        {
+          "message": "방황이라고 불렀지만, 사실은 내 방향을 찾는 탐색이었지.",
+          "duration": 160
         }
       ]
     ]
@@ -13,1074 +26,151 @@
     "sentences": [
       [
         {
-          "message": "[배경: 어둠과 빛이 섞인 공간, 'Refactor Core'. 이전의 모든 전투와 기억이 이곳으로 모인다. 공간은 현실과 데이터의 경계에 있으며, 코드 문자열이 하늘에 흩날리고 있다.]",
-          "duration": 195
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "(조용히 눈을 뜨며) 여긴… 아무 소리도 없네.",
-          "asset": "emoji-star",
-          "duration": 145
-        }
-      ],
-      [
-        {
-          "message": "마지막 장소답게, 정말 고요하군.",
-          "asset": "emoji-sunrise",
-          "duration": 125
+          "message": "[HUD] 웨이커: 사용자 경험 실험. 세미티에스: 산업 솔루션 탐색. 파운트: 데이터 금융 플레이.",
+          "duration": 180
         }
       ],
       {
-        "prompt": "Refactor Core에서 어떤 마음가짐을 다질까?",
+        "prompt": "이번 포털에서 어떤 교훈을 먼저 정리할까?",
         "choices": [
           {
-            "text": "그리드와의 대화를 준비하며 차분히 호흡을 맞춘다"
+            "text": "웨이커의 실험정신",
+            "goTo": {
+              "id": "waker"
+            }
           },
           {
-            "text": "마지막 전투를 각오하고 감정의 불꽃을 끌어올린다"
+            "text": "세미티에스의 산업지식",
+            "goTo": {
+              "id": "semitus"
+            }
           },
           {
-            "text": "동료들의 목소리를 떠올리며 혼자가 아니라는 걸 되새긴다"
+            "text": "파운트의 데이터 감각",
+            "goTo": {
+              "id": "fount"
+            }
           }
         ]
       }
     ]
   },
   {
-    "character": "엘리의 목소리",
-    "place": "Refactor Core",
+    "id": "waker",
+    "place": "웨이커 랩",
     "sentences": [
       [
         {
-          "message": "그건 네 안의 세계야, 매튜.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "외부의 모든 연결이 끊겼어. 지금 넌, 오직 너 자신과만 연결돼 있지.",
-          "duration": 85
-        }
-      ]
-    ]
-  },
-  {
-    "character": "세라의 목소리",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "돌아오지 못할 수도 있어.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "그래도 가겠다는 거야?",
-          "duration": 95
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "(미소 지으며) 돌아오는 게 목적이 아니야.",
-          "asset": "emoji-smile",
-          "duration": 135
-        }
-      ],
-      [
-        {
-          "message": "끝을 보는 게 목적이지.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "[공간 중앙에, 붉은 오라와 함께 한 존재가 모습을 드러낸다.]",
-          "duration": 160
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "드디어 왔구나.",
-          "duration": 90
-        }
-      ],
-      [
-        {
-          "message": "너는 결국 나를 버리지 못했어.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "버리기 위해 온 게 아니야.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "이제는… 받아들이러 왔지.",
-          "duration": 120
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "(비웃으며) 받아들이겠다고?",
-          "asset": "emoji-smile",
-          "duration": 115
-        }
-      ],
-      [
-        {
-          "message": "불완전함과 타협하겠다는 거야?",
-          "asset": "emoji-bolt",
-          "duration": 60
-        },
-        {
-          "message": "그럼 넌 더 이상 '개발자'가 아니야.",
-          "asset": "emoji-fire",
-          "duration": 65
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "아니, 그게 진짜 개발자야.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "모든 걸 제어하지 않고, 변화를 ‘함께’ 만드는 사람.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "변화는 혼돈이야.",
-          "asset": "emoji-bolt",
-          "duration": 60
-        }
-      ],
-      [
-        {
-          "message": "혼돈은 낭비고, 낭비는 파멸이지.",
-          "asset": "emoji-fire",
-          "duration": 65
-        }
-      ],
-      [
-        {
-          "message": "넌 이 세계를 그렇게 만들었잖아.",
-          "asset": "emoji-speech",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "완벽을 버리고, 균형이랍시고 불안정한 시스템을 남겼지.",
-          "asset": "emoji-gear",
-          "duration": 90
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "그래, 불안정하지.",
-          "asset": "emoji-leaf",
-          "duration": 115
-        }
-      ],
-      [
-        {
-          "message": "하지만 살아 있잖아.",
-          "asset": "emoji-sunrise",
-          "duration": 115
-        }
-      ],
-      [
-        {
-          "message": "완벽한 코드엔 생명이 없어.",
-          "asset": "emoji-gear",
-          "duration": 90
-        }
-      ],
-      [
-        {
-          "message": "그건 단지, 정지된 신의 사체일 뿐이야.",
-          "asset": "emoji-sparkle",
-          "duration": 125
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "(주변 공간이 진동하며 붉은 코드 폭풍이 일어난다.)",
-          "asset": "emoji-bolt",
-          "duration": 95
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "그럼 증명해봐.",
-          "duration": 90
-        }
-      ],
-      [
-        {
-          "message": "그 ‘살아 있음’이 나보다 강하다는 걸.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "좋아.",
-          "duration": 85
-        }
-      ],
-      [
-        {
-          "message": "오늘, 나는 불완전함의 힘으로 널 리팩터링하겠어.",
-          "duration": 100
-        }
-      ],
-      {
-        "prompt": "그리드와의 결전을 어떤 전략으로 이끌까?",
-        "choices": [
-          {
-            "text": "논리와 감정을 동시에 구사해 균형의 힘을 보여준다"
-          },
-          {
-            "text": "그리드의 공격을 흡수하며 성장 코드를 역으로 실행한다"
-          },
-          {
-            "text": "동료들의 기억을 소환해 협력의 힘으로 압박한다"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "[전투 개시 – 붉은 전류와 푸른 코드가 충돌한다.]",
-          "duration": 160
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "`for(let i=0; i<∞; i++){ destroy(human); }`",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "`try { embrace(failure); } catch(e) { grow(e); }`",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "(공간이 흔들리며, 두 코드가 서로의 명령을 상쇄한다.)",
-          "asset": "emoji-gear",
-          "duration": 120
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "그 따위 감정의 코드로 날 멈출 수 있을 것 같아?!",
-          "duration": 80
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "멈추려는 게 아니야.",
-          "duration": 90
-        }
-      ],
-      [
-        {
-          "message": "이해하려는 거야.",
-          "duration": 90
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "(빛이 터지며, 둘의 형상이 서로 섞이기 시작한다.)",
-          "asset": "emoji-sparkle",
-          "duration": 155
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "그만!",
-          "duration": 70
-        }
-      ],
-      [
-        {
-          "message": "넌 나를 없애면, 스스로도 사라진다고!",
-          "duration": 85
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "그럼 사라지겠지.",
-          "duration": 90
-        }
-      ],
-      [
-        {
-          "message": "하지만 난 네 안에 있었고, 넌 내 안에 있었어.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "우리 둘 다 하나였던 거야.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "그럼… 나를 ‘인정’하겠다는 거냐?",
-          "duration": 115
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "그래.",
-          "duration": 85
-        }
-      ],
-      [
-        {
-          "message": "집요함, 완벽주의, 그리고 그 끝없는 욕망.",
-          "asset": "emoji-bolt",
-          "duration": 65
-        }
-      ],
-      [
-        {
-          "message": "그건 악이 아니야.",
-          "asset": "emoji-leaf",
-          "duration": 115
-        }
-      ],
-      [
-        {
-          "message": "단지 방향을 잃은 열정일 뿐이야.",
-          "asset": "emoji-sparkle",
-          "duration": 125
-        }
-      ],
-      [
-        {
-          "message": "이제 그 열정을, 목적 없는 불꽃이 아니라 온기의 불빛으로 바꿀 때야.",
-          "asset": "emoji-sunrise",
-          "duration": 125
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "(그리드의 눈이 붉은 빛에서 은색으로 바뀐다.)",
-          "asset": "emoji-sparkle",
-          "duration": 155
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "…네가 이긴 게 아니다.",
-          "duration": 120
-        }
-      ],
-      [
-        {
-          "message": "너는 단지 나를 이해했을 뿐이야.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "Refactor Core",
-    "sentences": [
-      [
-        {
-          "message": "그게 진짜 승리야.",
-          "duration": 90
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "(공간이 차분히 빛으로 가득 차며, 주위의 데이터 문자열들이 부드럽게 흩날린다.)",
-          "asset": "emoji-gear",
-          "duration": 120
-        }
-      ]
-    ]
-  },
-  {
-    "character": "세라",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "(통신 재개) 매튜! 들려?!",
-          "asset": "emoji-speech",
-          "duration": 65
-        }
-      ],
-      [
-        {
-          "message": "신호가 돌아왔어! 너… 살아 있는 거야?",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "(숨을 고르며) 그래… 아직은.",
-          "asset": "emoji-relaxed",
-          "duration": 175
-        }
-      ]
-    ]
-  },
-  {
-    "character": "루크",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "시스템도 복원됐어.",
-          "duration": 90
-        }
-      ],
-      [
-        {
-          "message": "전부 안정화됐어. 도대체 무슨 짓을 한 거야?",
-          "duration": 95
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "그리드를… 내 안으로 통합했어.",
-          "asset": "emoji-fire",
-          "duration": 85
-        }
-      ],
-      [
-        {
-          "message": "이제 우린 둘이 아니라 하나야.",
-          "asset": "emoji-star",
-          "duration": 110
-        }
-      ]
-    ]
-  },
-  {
-    "character": "엘리",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "(미소 지으며) 완벽과 불완전함이 하나가 된 존재라…",
-          "asset": "emoji-smile",
-          "duration": 155
-        }
-      ],
-      [
-        {
-          "message": "그게 바로, 진짜 ‘균형’이지.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "(공간이 천천히 해체되며, 매튜가 현실로 돌아온다. 그의 눈빛은 더 이상 불타지 않는다. 대신 따뜻하게 빛난다.)",
-          "asset": "emoji-fire",
-          "duration": 130
-        }
-      ]
-    ]
-  },
-  {
-    "character": "세라",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "그 눈빛… 평화롭다.",
-          "duration": 110
-        }
-      ],
-      [
-        {
-          "message": "전에는 전쟁 같았는데.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "이젠 싸우지 않아도 돼.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "왜냐면, 나 자신을 이겼으니까.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "루크",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "자기 자신과 싸워서 이긴 사람은 드물지.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "보통 다 타버리거든.",
-          "duration": 90
-        }
-      ]
-    ]
-  },
-  {
-    "character": "해리",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "그리드가 사라졌다는 건—",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "너의 ‘집착’이 사라졌다는 뜻인가?",
-          "duration": 95
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "아니요.",
-          "duration": 85
-        }
-      ],
-      [
-        {
-          "message": "그건 여전히 있어요.",
-          "duration": 90
-        }
-      ],
-      [
-        {
-          "message": "다만, 이제는 불이 아니라 등불이에요.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "(매튜가 손을 내밀자, 화면 중앙에 푸른 불빛이 떠오른다. 그건 마치 심장처럼 고동친다.)",
-          "asset": "emoji-fire",
-          "duration": 95
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "이건 ‘Grit Engine’의 마지막 버전이에요.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "이제 이 엔진은 완벽함을 추구하지 않아요.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "대신, 성장을 기록하죠.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "엘리",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "결국, 네가 만든 건 ‘기록의 엔진’이었군.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "인간이 배우고, 실패하고, 살아가는 걸… 남기는 엔진.",
-          "duration": 120
-        }
-      ]
-    ]
-  },
-  {
-    "character": "세라",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "그럼 이건… 단순한 기술이 아니라 ‘철학’이네.",
-          "duration": 120
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "그래요.",
-          "duration": 85
-        }
-      ],
-      [
-        {
-          "message": "내 코드엔 이제… 인간의 불완전함이 새겨져 있어요.",
-          "duration": 120
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "(잠시 정적. 모든 인물이 매튜를 바라본다. 그리드의 목소리가 바람처럼 흐른다.)",
-          "asset": "emoji-speech",
-          "duration": 145
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "나는 사라지지 않는다.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "단지 네 안의 불로 남을 뿐이다.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "그럼… 다시 만날지도 모르겠네.",
-          "duration": 120
-        }
-      ]
-    ]
-  },
-  {
-    "character": "그리드",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "그땐 싸우지 말자.",
-          "duration": 90
-        }
-      ],
-      [
-        {
-          "message": "함께 리팩터링하자.",
-          "duration": 90
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "(빛이 사라지고, 모든 소리가 멎는다.)",
-          "asset": "emoji-sparkle",
-          "duration": 155
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "[엔딩 시퀀스 — 서사 대사]",
-          "duration": 160
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "내레이션",
-    "sentences": [
-      [
-        {
-          "message": "“완벽을 향해 달리던 나는, 결국 불완전함 속에서 완성되었다.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "불은 사라지지 않는다.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "단지 모양을 바꿀 뿐이다.”",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "세라",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "이제 우린 어디로 가?",
-          "duration": 95
-        }
-      ]
-    ]
-  },
-  {
-    "character": "매튜",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "…다음 프로젝트로.",
-          "duration": 110
-        }
-      ],
-      [
-        {
-          "message": "세상엔 아직 리팩터링이 필요한 것들이 많으니까.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "루크",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "그럼 ‘매튜 길드’의 새로운 모험이 시작되는 거네.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "해리",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "좋아, 그럼 이번엔 나도 끼워줘.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "이제 진짜 ‘모험’ 같군.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "character": "엘리",
-    "place": "현실 세계",
-    "sentences": [
-      [
-        {
-          "message": "(미소하며) 이제야 인간과 시스템이… 하나가 됐군.",
-          "asset": "emoji-smile",
-          "duration": 155
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "[음악: “GRIT – Rebirth of the Flame”]",
+          "message": "(프로토타입 테스트) 빠른 사용자 피드백 루프를 구축한다.",
           "duration": 150
         }
       ],
       [
         {
-          "message": "(모래 위에서 서서히 떠오르는 로고)",
-          "asset": "emoji-rocket",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "〈매튜의 모험 — Matthew’s Quest〉",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "The Flame Never Dies.",
-          "duration": 100
-        }
-      ]
-    ]
-  },
-  {
-    "sentences": [
-      [
-        {
-          "message": "[CHAPTER 6 END]",
+          "message": "실험정신 + UX 감수성이 인벤토리에 추가된다.",
           "duration": 150
         }
       ]
+    ],
+    "next": {
+      "id": "chapter5-gather"
+    }
+  },
+  {
+    "id": "semitus",
+    "place": "세미티에스 현장",
+    "sentences": [
+      [
+        {
+          "message": "(안전모 착용) 산업 파트너와 함께 현장을 돌며 요구사항을 수집한다.",
+          "duration": 160
+        }
+      ],
+      [
+        {
+          "message": "현실 문제를 시스템에 녹이는 설계력이 상승한다.",
+          "duration": 150
+        }
+      ]
+    ],
+    "next": {
+      "id": "chapter5-gather"
+    }
+  },
+  {
+    "id": "fount",
+    "place": "파운트 전략실",
+    "sentences": [
+      [
+        {
+          "message": "(데이터 모델 분석) 금융 알고리즘과 서비스 경험을 연결한다.",
+          "duration": 160
+        }
+      ],
+      [
+        {
+          "message": "데이터 감각 + 비즈니스 시야가 커진다.",
+          "duration": 150
+        }
+      ]
+    ],
+    "next": {
+      "id": "chapter5-gather"
+    }
+  },
+  {
+    "id": "chapter5-gather",
+    "sentences": [
+      [
+        {
+          "message": "[업데이트] 세 세계의 경험이 합쳐져 ‘프리랜서 모드’가 해금된다.",
+          "duration": 170
+        }
+      ],
+      [
+        {
+          "message": "이제 나는 스스로 프로젝트를 선택하고, 팀을 구성하며, 세계를 돌아다닌다.",
+          "duration": 170
+        }
+      ]
+    ]
+  },
+  {
+    "character": "클라이언트 NPC",
+    "place": "프리랜서 허브",
+    "sentences": [
+      [
+        {
+          "message": "매튜, 이번엔 어떤 모험을 함께할까요?",
+          "duration": 140
+        }
+      ]
+    ]
+  },
+  {
+    "character": "매튜",
+    "place": "프리랜서 허브",
+    "sentences": [
+      [
+        {
+          "message": "(미소) 속도, 리더십, 책임, 성장, 탐색… 이제는 내가 모두를 조합해 제안할 차례야.",
+          "duration": 190
+        }
+      ],
+      [
+        {
+          "message": "이력서는 더 이상 문서가 아니라, 내가 사는 게임이지.",
+          "duration": 170
+        }
+      ]
     ]
   },
   {
     "sentences": [
       [
         {
-          "message": "“나는 나의 불을 두려워하지 않는다.",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "왜냐하면, 그 불은 나를 태우는 게 아니라",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "세상을 비추기 때문이다.”",
-          "duration": 100
-        }
-      ],
-      [
-        {
-          "message": "— 매튜, 〈Refactor Log 006: Final Merge〉",
-          "duration": 100
+          "message": "[엔딩 롤] ‘Matthew’s Adventure: Resume Edition’ — The Flame Never Dies.",
+          "duration": 200
         }
       ]
     ]
