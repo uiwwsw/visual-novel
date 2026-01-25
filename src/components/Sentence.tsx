@@ -379,9 +379,9 @@ const Sentence = ({
                       'slide-in-left': { initial: { x: -100, opacity: 0 }, animate: { x: 0, opacity: 1 } },
                       'slide-in-right': { initial: { x: 100, opacity: 0 }, animate: { x: 0, opacity: 1 } },
                       'zoom-in': { initial: { scale: 0, opacity: 0 }, animate: { scale: 1, opacity: 1 } },
-                      'shake': { animate: { x: [-5, 5, -5, 5, 0], transition: { repeat: Infinity, duration: 0.1 } } },
-                      'pulse': { animate: { scale: [1, 1.1, 1], transition: { repeat: Infinity, duration: 1.5 } } },
-                      'float': { animate: { y: [0, -15, 0], transition: { repeat: Infinity, duration: 3, ease: "easeInOut" } } },
+                      'shake': { animate: { x: [-5, 5, -5, 5, 0], transition: { duration: 0.5 } } },
+                      'pulse': { animate: { scale: [1, 1.1, 1], transition: { duration: 1.5 } } },
+                      'float': { animate: { y: [0, -15, 0], transition: { duration: 3, ease: "easeInOut" } } },
                       'flash': { animate: { opacity: [0, 1, 0, 1, 0] } },
                       'none': { initial: { opacity: 1 }, animate: { opacity: 1 }, exit: { opacity: 1 } },
 
@@ -389,8 +389,8 @@ const Sentence = ({
                       'fade-in-slow': { initial: { opacity: 0 }, animate: { opacity: 1, transition: { duration: 2.0 } } },
                       'fade-out-slow': { exit: { opacity: 0, transition: { duration: 2.0 } } },
                       'impact': { initial: { scale: 2.5, opacity: 0 }, animate: { scale: 1, opacity: 1, transition: { type: 'spring', stiffness: 300, damping: 15 } } },
-                      'shake-hard': { animate: { x: [-10, 10, -8, 8, -5, 5, 0], y: [-5, 5, -3, 3, 0], transition: { repeat: Infinity, duration: 0.2 } } },
-                      'move-left-right': { initial: { x: '-10%', opacity: 0 }, animate: { x: ['-10%', '110%'], opacity: 1, transition: { x: { duration: 5, ease: 'linear', repeat: Infinity }, opacity: { duration: 0.5 } } } }
+                      'shake-hard': { animate: { x: [-10, 10, -8, 8, -5, 5, 0], y: [-5, 5, -3, 3, 0], transition: { duration: 0.5 } } },
+                      'move-left-right': { initial: { x: '-10%', opacity: 0 }, animate: { x: ['-10%', '110%'], opacity: 1, transition: { x: { duration: 5, ease: 'linear' }, opacity: { duration: 0.5 } } } }
                     };
 
                     let initial: any = variants.initial;

@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import Battle from '@/Battle';
@@ -31,7 +32,7 @@ const Game = () => {
 
   const passChoiceTimeoutRef = useRef<number | null>(null);
   const handleGoSavePage = useCallback(() => addStorage({ page: 'save', level }), [addStorage, level]);
-  const handleGoCreditPage = useCallback(() => addStorage({ page: 'credit', level: 0 }), [addStorage]);
+  const handleGoToBeContinued = useCallback(() => addStorage({ page: 'toBeContinued', level: 0 }), [addStorage]);
 
   const {
     assets,
@@ -59,7 +60,7 @@ const Game = () => {
   } = useNovelEngine({
     level,
     onChapterEnd: handleGoSavePage,
-    onLoadError: handleGoCreditPage,
+    onLoadError: handleGoToBeContinued,
   });
 
   const [isInitialized, setIsInitialized] = useState(false);
@@ -346,9 +347,21 @@ const Game = () => {
               </div>
             </div>
 
-            {displayCharacter && characterImage && (
-              <img className="absolute bottom-0 z-10 w-1/2" style={characterPosition} src={characterImage} alt={displayCharacter} />
-            )}
+            <AnimatePresence mode="wait">
+              {displayCharacter && characterImage && (
+                <motion.img
+                  key={characterImage}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  className="absolute bottom-0 z-10 max-h-96 object-contain"
+                  style={characterPosition}
+                  src={characterImage}
+                  alt={displayCharacter}
+                />
+              )}
+            </AnimatePresence>
             {displayPlace && assets[displayPlace]?.image && (
               <img
                 className={`absolute h-full w-full object-cover transition-opacity duration-500 ${isFading ? 'opacity-0' : 'opacity-100'}`}
