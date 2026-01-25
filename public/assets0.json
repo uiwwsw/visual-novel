@@ -1,29 +1,30 @@
 {
   "main-bg": {
-    "music": "/music/chapter-0-main.ogg"
+    "music": "/music/mystery.mp3"
   },
-  "매튜": {
+  "루시안": {
     "image": "/assets/character-matthew.png"
   },
-  "세라": {
+  "에코": {
     "image": "/assets/character-sera.png"
   },
-  "경비병": {
-    "image": "/assets/character-grid.png"
+  "망각의-짐승": {
+    "image": "/assets/character-harry.png"
   },
-  "상인": {
-    "image": "/assets/character-grid.png"
+  "마도서": {
+    "image": "/assets/emoji-sparkle.svg"
   },
-  "변두리-마을-입구": {
-    "image": "/assets/bg-1.png",
-    "music": "/music/opening.ogg"
+  "폐허-기차역": {
+    "image": "/assets/bg-6.png",
+    "music": "/music/danger.ogg"
   },
-  "마을-광장": {
-    "image": "/assets/bg-2.png",
-    "music": "/music/town.ogg"
+  "쇠사슬": {
+    "image": "/assets/emoji-handshake.svg"
   },
-  "여관-복도-밤": {
-    "image": "/assets/bg-3.png",
-    "music": "/music/sanctuary.ogg"
+  "화염-폭발": {
+    "image": "/assets/emoji-fire.svg"
+  },
+  "번개": {
+    "image": "/assets/emoji-bolt.svg"
   }
 }
