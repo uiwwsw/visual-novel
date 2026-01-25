@@ -50,18 +50,7 @@
     "character": "???",
     "sentences": [
       {
-        "message": "...",
-        "visuals": [
-          {
-            "asset": "cloud",
-            "layout": "root",
-            "animation": "float",
-            "duration": 15000,
-            "style": {
-              "opacity": 0.4
-            }
-          }
-        ]
+        "message": "..."
       }
     ]
   },
@@ -85,45 +74,10 @@
     },
     "sentences": [
       {
-        "message": "...",
-        "visuals": [
-          {
-            "asset": "번개",
-            "layout": "stretch",
-            "animation": "flash",
-            "duration": 200,
-            "className": "bg-white opacity-50 z-50 fixed inset-0"
-          },
-          {
-            "asset": "폐허-기차역",
-            "layout": "root",
-            "animation": "shake",
-            "duration": 500
-          }
-        ]
+        "message": "..."
       },
       {
-        "message": "...",
-        "visuals": [
-          {
-            "asset": "폐허-기차역",
-            "layout": "root",
-            "animation": "fade-in",
-            "duration": 1000,
-            "style": {
-              "opacity": 1
-            }
-          },
-          {
-            "asset": "cloud",
-            "layout": "root",
-            "animation": "float",
-            "duration": 15000,
-            "style": {
-              "opacity": 0.4
-            }
-          }
-        ]
+        "message": "..."
       }
     ]
   },
@@ -135,15 +89,7 @@
     },
     "sentences": [
       {
-        "message": "크윽...!",
-        "visuals": [
-          {
-            "asset": "폐허-기차역",
-            "layout": "root",
-            "animation": "shake",
-            "duration": 500
-          }
-        ]
+        "message": "크윽...!"
       }
     ]
   },
@@ -194,16 +140,7 @@
     },
     "sentences": [
       {
-        "message": "...",
-        "visuals": [
-          {
-            "asset": "번개",
-            "layout": "stretch",
-            "animation": "flash",
-            "duration": 300,
-            "className": "bg-yellow-200 fixed inset-0 z-50"
-          }
-        ]
+        "message": "..."
       }
     ]
   },
@@ -273,7 +210,7 @@
         "message": "...",
         "visuals": [
           {
-            "asset": "effect2",
+            "asset": "effect1",
             "layout": "center",
             "animation": "move-left-right",
             "duration": 1000,
@@ -295,28 +232,6 @@
       {
         "message": "\"구속하라... [체인 바인드(Chain Bind)]!\"",
         "visuals": [
-          {
-            "asset": "쇠사슬",
-            "layout": "fixed",
-            "animation": "slide-in-left",
-            "duration": 400,
-            "style": {
-              "bottom": "150px",
-              "left": "20%",
-              "width": "200px"
-            }
-          },
-          {
-            "asset": "쇠사슬",
-            "layout": "fixed",
-            "animation": "slide-in-right",
-            "duration": 400,
-            "style": {
-              "bottom": "150px",
-              "right": "20%",
-              "width": "200px"
-            }
-          },
           {
             "asset": "monster1",
             "layout": "center",
@@ -372,15 +287,6 @@
             "layout": "center",
             "animation": "fade-out",
             "duration": 1000
-          },
-          {
-            "asset": "쇠사슬",
-            "layout": "fixed",
-            "animation": "fade-out",
-            "duration": 1000,
-            "style": {
-              "display": "none"
-            }
           }
         ]
       }
@@ -396,7 +302,7 @@
         "message": "...",
         "visuals": [
           {
-            "asset": "effect2",
+            "asset": "effect1",
             "layout": "center",
             "animation": "float",
             "duration": 3000

@@ -3,14 +3,6 @@
     "sentences": [
       {
         "message": "",
-        "visuals": [
-          {
-            "asset": "황혼의-평원",
-            "layout": "root",
-            "animation": "fade-in",
-            "duration": 2000
-          }
-        ],
         "system": "제1장: 멈춰버린 시간의 궤적",
         "duration": 3000
       }
