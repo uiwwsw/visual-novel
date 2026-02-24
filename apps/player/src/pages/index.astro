@@ -154,20 +154,33 @@ const studioApiBase = import.meta.env.PUBLIC_STUDIO_API_BASE_URL ?? "http://loca
         min-height: 280px;
       }
 
-      .character-sprite {
+      .character-layer {
         position: absolute;
-        right: 8px;
-        bottom: 8px;
+        inset: 0;
         z-index: 2;
-        width: min(36vw, 320px);
-        max-height: min(52vh, 420px);
-        object-fit: contain;
-        filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
         pointer-events: none;
       }
 
-      .character-sprite.hidden {
-        display: none;
+      .character-sprite {
+        position: absolute;
+        bottom: 8px;
+        width: min(30vw, 260px);
+        max-height: min(52vh, 420px);
+        object-fit: contain;
+        filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+      }
+
+      .character-sprite.slot-left {
+        left: 4%;
+      }
+
+      .character-sprite.slot-center {
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .character-sprite.slot-right {
+        right: 4%;
       }
 
       .node-meta {
@@ -301,7 +314,7 @@ const studioApiBase = import.meta.env.PUBLIC_STUDIO_API_BASE_URL ?? "http://loca
 
       <section class="pixel-frame scene">
         <div class="scene-window" id="sceneWindow"></div>
-        <img id="characterSprite" class="character-sprite hidden" alt="character" />
+        <div id="characterLayer" class="character-layer"></div>
         <div class="dialog">
           <div class="speaker" id="speaker"></div>
           <div class="text" id="text"></div>
@@ -329,6 +342,7 @@ const studioApiBase = import.meta.env.PUBLIC_STUDIO_API_BASE_URL ?? "http://loca
       let nodes = new Map(scenario.nodes.map((n) => [n.id, n]));
       const state = {
         currentId: scenario.entryNodeId,
+        turnIndex: 0,
         saveSlot: null,
         projectRef: null,
         currentMusic: null,
@@ -342,7 +356,7 @@ const studioApiBase = import.meta.env.PUBLIC_STUDIO_API_BASE_URL ?? "http://loca
         title: document.getElementById("title"),
         nodeMeta: document.getElementById("nodeMeta"),
         sceneWindow: document.getElementById("sceneWindow"),
-        characterSprite: document.getElementById("characterSprite"),
+        characterLayer: document.getElementById("characterLayer"),
         bgmPlayer: document.getElementById("bgmPlayer"),
         speaker: document.getElementById("speaker"),
         text: document.getElementById("text"),
@@ -419,10 +433,70 @@ const studioApiBase = import.meta.env.PUBLIC_STUDIO_API_BASE_URL ?? "http://loca
         scenario = nextScenario;
         nodes = new Map((scenario.nodes || []).map((n) => [n.id, n]));
         state.currentId = scenario.entryNodeId;
+        state.turnIndex = 0;
         state.currentMusic = null;
         el.bgmPlayer.pause();
         el.bgmPlayer.removeAttribute("src");
         el.bgmPlayer.load();
+      }
+
+      function getSceneTurns(node) {
+        const turns = Array.isArray(node?.data?.turns) ? node.data.turns : [];
+        if (turns.length > 0) {
+          return turns;
+        }
+        return [
+          {
+            speaker: node?.data?.speaker,
+            text: node?.data?.text,
+            characterImage: node?.data?.characterImage
+          }
+        ];
+      }
+
+      function normalizeSceneCharacters(inputCharacters = []) {
+        const normalized = [];
+        for (const raw of inputCharacters) {
+          if (!raw || typeof raw !== "object") {
+            continue;
+          }
+          const image = String(raw.image || raw.url || "").trim();
+          if (!image) {
+            continue;
+          }
+          const slot = ["left", "center", "right"].includes(raw.slot) ? raw.slot : "right";
+          normalized.push({ image, slot });
+        }
+        return normalized;
+      }
+
+      function resolveSceneCharacters(node, turn) {
+        const turnCharacters = normalizeSceneCharacters(turn?.characters);
+        if (turnCharacters.length > 0) {
+          return turnCharacters;
+        }
+        if (turn?.characterImage) {
+          return [{ image: String(turn.characterImage), slot: "right" }];
+        }
+        const sceneCharacters = normalizeSceneCharacters(node?.data?.characters);
+        if (sceneCharacters.length > 0) {
+          return sceneCharacters;
+        }
+        if (node?.data?.characterImage) {
+          return [{ image: String(node.data.characterImage), slot: "right" }];
+        }
+        return [];
+      }
+
+      function renderCharacterLayer(characters) {
+        el.characterLayer.innerHTML = "";
+        for (const character of characters) {
+          const sprite = document.createElement("img");
+          sprite.alt = "character";
+          sprite.src = character.image;
+          sprite.className = `character-sprite slot-${character.slot}`;
+          el.characterLayer.appendChild(sprite);
+        }
       }
 
       function applyMusic(musicUrl) {
@@ -478,8 +552,7 @@ const studioApiBase = import.meta.env.PUBLIC_STUDIO_API_BASE_URL ?? "http://loca
           el.sceneWindow.style.backgroundImage = "";
           el.sceneWindow.style.backgroundSize = "";
           el.sceneWindow.style.backgroundPosition = "";
-          el.characterSprite.classList.add("hidden");
-          el.characterSprite.removeAttribute("src");
+          renderCharacterLayer([]);
           el.speaker.textContent = "ERROR";
           el.text.textContent = String(error.message || error);
           el.choices.innerHTML = "";
@@ -494,8 +567,7 @@ const studioApiBase = import.meta.env.PUBLIC_STUDIO_API_BASE_URL ?? "http://loca
           el.sceneWindow.style.backgroundImage = "";
           el.sceneWindow.style.backgroundSize = "";
           el.sceneWindow.style.backgroundPosition = "";
-          el.characterSprite.classList.add("hidden");
-          el.characterSprite.removeAttribute("src");
+          renderCharacterLayer([]);
           el.speaker.textContent = "ERROR";
           el.text.textContent = "현재 노드를 찾을 수 없습니다.";
           el.choices.innerHTML = "";
@@ -508,7 +580,6 @@ const studioApiBase = import.meta.env.PUBLIC_STUDIO_API_BASE_URL ?? "http://loca
         el.nodeMeta.textContent = `node: ${node.id} (${node.type})`;
         el.choices.innerHTML = "";
         const background = node.data?.background;
-        const characterImage = node.data?.characterImage;
         const music = node.data?.music;
         if (background) {
           const safeUrl = String(background).replace(/"/g, "%22");
@@ -520,28 +591,35 @@ const studioApiBase = import.meta.env.PUBLIC_STUDIO_API_BASE_URL ?? "http://loca
           el.sceneWindow.style.backgroundSize = "";
           el.sceneWindow.style.backgroundPosition = "";
         }
-        if (characterImage) {
-          el.characterSprite.src = String(characterImage);
-          el.characterSprite.classList.remove("hidden");
-        } else {
-          el.characterSprite.classList.add("hidden");
-          el.characterSprite.removeAttribute("src");
-        }
         applyMusic(music);
         const textSpeed = resolveNodeTextSpeed(node);
 
         if (node.type === "scene") {
-          el.speaker.textContent = node.data?.speaker || "Narrator";
-          renderDialogText(node.data?.text || "", textSpeed);
-          el.nextBtn.disabled = !node.next;
+          const turns = getSceneTurns(node);
+          const activeTurnIndex = Math.max(0, Math.min(state.turnIndex, turns.length - 1));
+          state.turnIndex = activeTurnIndex;
+          const turn = turns[activeTurnIndex] || {};
+          renderCharacterLayer(resolveSceneCharacters(node, turn));
+
+          el.speaker.textContent = turn.speaker || node.data?.speaker || "Narrator";
+          renderDialogText(turn.text || node.data?.text || "", textSpeed);
+          const hasMoreTurns = activeTurnIndex < turns.length - 1;
+          el.nextBtn.disabled = !hasMoreTurns && !node.next;
           el.nextBtn.onclick = () => {
             if (revealAllDialogText()) {
               return;
             }
+            if (hasMoreTurns) {
+              state.turnIndex = activeTurnIndex + 1;
+              render();
+              return;
+            }
+            state.turnIndex = 0;
             state.currentId = node.next;
             render();
           };
         } else if (node.type === "choice") {
+          renderCharacterLayer([]);
           el.speaker.textContent = "Choice";
           renderDialogText(node.data?.prompt || "선택", textSpeed);
           el.nextBtn.disabled = true;
@@ -549,16 +627,19 @@ const studioApiBase = import.meta.env.PUBLIC_STUDIO_API_BASE_URL ?? "http://loca
             const button = document.createElement("button");
             button.textContent = option.label;
             button.onclick = () => {
+              state.turnIndex = 0;
               state.currentId = option.to;
               render();
             };
             el.choices.appendChild(button);
           }
         } else if (node.type === "ending") {
+          renderCharacterLayer([]);
           el.speaker.textContent = "ENDING";
           renderDialogText(node.data?.title || "The End", textSpeed);
           el.nextBtn.disabled = true;
         } else {
+          renderCharacterLayer([]);
           el.speaker.textContent = node.type;
           renderDialogText(JSON.stringify(node.data || {}), textSpeed);
           el.nextBtn.disabled = true;
@@ -569,16 +650,18 @@ const studioApiBase = import.meta.env.PUBLIC_STUDIO_API_BASE_URL ?? "http://loca
 
       el.restartBtn.onclick = () => {
         state.currentId = scenario.entryNodeId;
+        state.turnIndex = 0;
         render();
       };
       el.saveBtn.onclick = () => {
-        state.saveSlot = { currentId: state.currentId };
+        state.saveSlot = { currentId: state.currentId, turnIndex: state.turnIndex };
         localStorage.setItem("vn.quickSave", JSON.stringify(state.saveSlot));
       };
       el.loadBtn.onclick = () => {
         const saved = state.saveSlot || JSON.parse(localStorage.getItem("vn.quickSave") || "null");
         if (!saved) return;
         state.currentId = saved.currentId;
+        state.turnIndex = Number.isInteger(saved.turnIndex) ? saved.turnIndex : 0;
         render();
       };
       el.fetchProjectBtn.onclick = () => {

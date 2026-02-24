@@ -4,7 +4,7 @@ const defaultScenario = {
   entryNodeId: "n_start",
   nodes: [
     { id: "n_start", type: "scene", next: "n_end", data: { text: "첫 장면입니다." } },
-    { id: "n_end", type: "ending", data: { endingId: "end_1", title: "엔딩" } }
+    { id: "n_end", type: "scene", next: null, data: { text: "마지막 장면입니다." } }
   ]
 };
 const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhost:4322";
@@ -119,6 +119,18 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
         color: #dce8ff;
       }
 
+      .asset-upload-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .asset-upload-row button {
+        width: auto;
+        min-width: 108px;
+      }
+
       input,
       select,
       textarea,
@@ -176,6 +188,15 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
         min-height: 100%;
       }
 
+      :global(.marquee-select) {
+        position: absolute;
+        border: 2px dashed #50e2b7;
+        background: rgba(80, 226, 183, 0.28);
+        box-shadow: 0 0 0 1px rgba(12, 20, 34, 0.9) inset;
+        pointer-events: none;
+        z-index: 6;
+      }
+
       :global(.node) {
         position: absolute;
         width: 220px;
@@ -202,6 +223,20 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
         box-shadow:
           inset 0 0 0 2px #1f6e5b,
           0 0 0 2px rgba(80, 226, 183, 0.4);
+      }
+
+      :global(.node.asset-drop-target) {
+        border-color: #50e2b7;
+        box-shadow:
+          inset 0 0 0 2px #1f6e5b,
+          0 0 0 3px rgba(80, 226, 183, 0.45);
+      }
+
+      :global(.node.asset-node) {
+        border-style: dashed;
+        border-color: #62e5c0;
+        box-shadow: inset 0 0 0 2px #2f8a73;
+        background: linear-gradient(180deg, #1f5b56, #19453f);
       }
 
       :global(.node.selected) {
@@ -254,8 +289,20 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
         stroke-width: 2;
       }
 
+      :global(.edge-line-asset) {
+        stroke: rgba(80, 226, 183, 0.95);
+        stroke-width: 2;
+        stroke-dasharray: 4 3;
+      }
+
       :global(.edge-label) {
         fill: #ffcb61;
+        font-size: 10px;
+        font-family: "Press Start 2P", monospace;
+      }
+
+      :global(.edge-label-asset) {
+        fill: #50e2b7;
         font-size: 10px;
         font-family: "Press Start 2P", monospace;
       }
@@ -317,9 +364,54 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
         min-width: 80px;
       }
 
+      .asset-toolbar {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(80px, 1fr));
+        gap: 6px;
+      }
+
+      .asset-list {
+        display: grid;
+        gap: 6px;
+        max-height: 220px;
+        overflow: auto;
+      }
+
+      .asset-card {
+        border: 2px solid rgba(168, 197, 255, 0.55);
+        background: rgba(16, 20, 42, 0.6);
+        padding: 8px;
+        cursor: grab;
+      }
+
+      .asset-card:active {
+        cursor: grabbing;
+      }
+
+      .asset-card .meta {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+      }
+
+      .asset-chip {
+        border: 1px solid #dce9ff;
+        background: #3f66a7;
+        color: #f3f8ff;
+        padding: 1px 6px;
+        font-size: 11px;
+      }
+
+      .asset-preview {
+        width: 100%;
+        max-height: 72px;
+        object-fit: cover;
+        border: 1px solid rgba(168, 197, 255, 0.45);
+      }
+
       .toolbar {
         display: grid;
-        grid-template-columns: repeat(8, minmax(120px, 1fr));
+        grid-template-columns: repeat(9, minmax(120px, 1fr));
         gap: 8px;
         position: sticky;
         top: 0;
@@ -402,8 +494,8 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
       <section class="panel editor-panel">
         <div class="toolbar">
           <button id="addScene">+ Scene</button>
-          <button id="addChoice">+ Choice</button>
-          <button id="addEnding">+ Ending</button>
+          <button id="addAsset">+ Asset</button>
+          <button id="autoLayout">Auto Layout</button>
           <button id="saveScenario" class="primary">Save Scenario</button>
           <button id="validateScenario">Validate</button>
           <button id="connectNode">Connect (Drag)</button>
@@ -432,16 +524,33 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
           <label id="nodeNextField"><span>Next Node ID</span>
             <input id="nodeNext" placeholder="n_end" />
           </label>
-          <div id="choiceOptionsField" class="hidden">
-            <span>Choice Options</span>
-            <div id="choiceOptionsEditor" class="choice-options"></div>
-            <button id="addChoiceOption">+ Option</button>
-          </div>
+          <label id="assetKindField"><span>Asset Kind</span>
+            <select id="assetKind">
+              <option value="background">background</option>
+              <option value="character">character</option>
+              <option value="music">music</option>
+            </select>
+          </label>
+          <label id="assetLabelField"><span>Asset Label</span>
+            <input id="assetLabel" placeholder="asset label" />
+          </label>
+          <label id="assetUrlField"><span>Asset URL</span>
+            <input id="assetUrl" placeholder="/api/assets/.../file.png" />
+          </label>
+          <button id="assetUpload" type="button">에셋 업로드</button>
+          <button id="applyAssetToLastScene" type="button">선택 씬 일괄 적용</button>
+          <input id="assetUploadFile" type="file" accept="image/*,audio/*" class="hidden" />
           <label>Background URL
             <input id="nodeBackground" placeholder="/assets/bg/school.jpg" />
           </label>
-          <label>Character Image URL
-            <input id="nodeCharacterImage" placeholder="/assets/char/hero.png" />
+          <label>Character Left URL
+            <input id="nodeCharacterLeft" placeholder="/assets/char/left.png" />
+          </label>
+          <label>Character Center URL
+            <input id="nodeCharacterCenter" placeholder="/assets/char/center.png" />
+          </label>
+          <label>Character Right URL
+            <input id="nodeCharacterRight" placeholder="/assets/char/right.png" />
           </label>
           <label>BGM URL
             <input id="nodeMusic" placeholder="/assets/bgm/theme.mp3" />
@@ -475,7 +584,16 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
         connectDrag: null,
         connectHoverNodeId: null,
         scenario: structuredClone(defaultScenario),
-        uiPositions: {}
+        uiPositions: {},
+        lastSelectedSceneId: null,
+        multiSelectedSceneIds: [],
+        marquee: null,
+        assetDropNodeId: null,
+        autosaveTimer: null,
+        autosaveDirty: false,
+        autosaveInFlight: false,
+        autosaveQueued: false,
+        autosaveHadError: false
       };
 
       const el = {
@@ -498,16 +616,24 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
         nodeTextSpeed: document.getElementById("nodeTextSpeed"),
         nodeNextField: document.getElementById("nodeNextField"),
         nodeNext: document.getElementById("nodeNext"),
-        choiceOptionsField: document.getElementById("choiceOptionsField"),
-        choiceOptionsEditor: document.getElementById("choiceOptionsEditor"),
-        addChoiceOption: document.getElementById("addChoiceOption"),
+        assetKindField: document.getElementById("assetKindField"),
+        assetKind: document.getElementById("assetKind"),
+        assetLabelField: document.getElementById("assetLabelField"),
+        assetLabel: document.getElementById("assetLabel"),
+        assetUrlField: document.getElementById("assetUrlField"),
+        assetUrl: document.getElementById("assetUrl"),
+        assetUpload: document.getElementById("assetUpload"),
+        applyAssetToLastScene: document.getElementById("applyAssetToLastScene"),
+        assetUploadFile: document.getElementById("assetUploadFile"),
         nodeBackground: document.getElementById("nodeBackground"),
-        nodeCharacterImage: document.getElementById("nodeCharacterImage"),
+        nodeCharacterLeft: document.getElementById("nodeCharacterLeft"),
+        nodeCharacterCenter: document.getElementById("nodeCharacterCenter"),
+        nodeCharacterRight: document.getElementById("nodeCharacterRight"),
         nodeMusic: document.getElementById("nodeMusic"),
         deleteNode: document.getElementById("deleteNode"),
         addScene: document.getElementById("addScene"),
-        addChoice: document.getElementById("addChoice"),
-        addEnding: document.getElementById("addEnding"),
+        addAsset: document.getElementById("addAsset"),
+        autoLayout: document.getElementById("autoLayout"),
         saveScenario: document.getElementById("saveScenario"),
         validateScenario: document.getElementById("validateScenario"),
         connectNode: document.getElementById("connectNode"),
@@ -518,14 +644,18 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
         activity: document.getElementById("activity")
       };
 
-      function headers() {
-        return {
-          "content-type": "application/json",
+      function headers(options = {}) {
+        const { json = true } = options;
+        const base = {
           "x-user-role": el.role.value,
           "x-plan-tier": el.plan.value,
           "x-user-id": el.userId.value,
           "x-org-id": el.orgId.value
         };
+        if (json) {
+          base["content-type"] = "application/json";
+        }
+        return base;
       }
 
       function draftKey() {
@@ -562,6 +692,7 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
           if (parsed.projectSlug) el.projectSlug.value = parsed.projectSlug;
           if (parsed.scenario?.entryNodeId && Array.isArray(parsed.scenario?.nodes)) {
             state.scenario = parsed.scenario;
+            normalizeScenarioNodeTypes();
           }
           if (parsed.uiPositions && typeof parsed.uiPositions === "object") {
             state.uiPositions = parsed.uiPositions;
@@ -579,14 +710,337 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
         el.activity.prepend(line);
       }
 
+      function normalizeScenarioNodeTypes() {
+        for (const node of state.scenario.nodes || []) {
+          node.data = node.data || {};
+          if (node.type !== "scene" && node.type !== "asset") {
+            const fallbackText = node.data?.text ?? node.data?.prompt ?? node.data?.title ?? "";
+            node.type = "scene";
+            node.data.text = fallbackText;
+            delete node.data.prompt;
+            delete node.data.options;
+            delete node.data.title;
+            delete node.data.endingId;
+          }
+          if (node.type === "scene") {
+            const legacyTargets = Array.isArray(node.data?.options)
+              ? node.data.options.map((o) => o?.to).filter(Boolean)
+              : [];
+            const normalizedTargets = Array.isArray(node.data?.targets) && node.data.targets.length > 0
+              ? node.data.targets.filter(Boolean)
+              : [node.next, ...legacyTargets].filter(Boolean);
+            setSceneTargets(node, normalizedTargets);
+            delete node.data.options;
+            delete node.data.prompt;
+            delete node.data.title;
+            delete node.data.endingId;
+            const normalizedCharacters = normalizeSceneCharacters(node);
+            if (normalizedCharacters.length > 0) {
+              setSceneCharacters(node, normalizedCharacters);
+              delete node.data.characterImage;
+            } else {
+              delete node.data.characters;
+            }
+          }
+          if (node.type === "asset") {
+            node.data.assetKind = ["background", "character", "music"].includes(node.data.assetKind) ? node.data.assetKind : "background";
+            node.data.label = node.data.label || "asset";
+            node.data.url = node.data.url || "";
+            delete node.next;
+          }
+        }
+      }
+
+      function normalizeCharacterSlot(slot, fallback = "right") {
+        return ["left", "center", "right"].includes(slot) ? slot : fallback;
+      }
+
+      function normalizeSceneCharacters(node) {
+        if (!node || node.type !== "scene") {
+          return [];
+        }
+        const raw = Array.isArray(node.data?.characters) ? node.data.characters : [];
+        const normalized = [];
+        for (const item of raw) {
+          if (!item || typeof item !== "object") {
+            continue;
+          }
+          const image = String(item.image || item.url || "").trim();
+          if (!image) {
+            continue;
+          }
+          normalized.push({ slot: normalizeCharacterSlot(item.slot), image });
+        }
+        if (normalized.length > 0) {
+          return normalized;
+        }
+        const legacy = String(node.data?.characterImage || "").trim();
+        if (!legacy) {
+          return [];
+        }
+        return [{ slot: "right", image: legacy }];
+      }
+
+      function getSceneCharacters(node) {
+        return normalizeSceneCharacters(node);
+      }
+
+      function setSceneCharacters(node, characters) {
+        if (!node || node.type !== "scene") {
+          return;
+        }
+        const uniqueBySlot = new Map();
+        for (const character of characters || []) {
+          if (!character?.image) {
+            continue;
+          }
+          uniqueBySlot.set(normalizeCharacterSlot(character.slot), {
+            slot: normalizeCharacterSlot(character.slot),
+            image: String(character.image).trim()
+          });
+        }
+        const ordered = ["left", "center", "right"]
+          .map((slot) => uniqueBySlot.get(slot))
+          .filter(Boolean);
+        if (ordered.length > 0) {
+          node.data.characters = ordered;
+        } else {
+          delete node.data.characters;
+        }
+      }
+
+      function findAvailableNodePosition(preferred, ignoreNodeId = null) {
+        const nodeWidth = 220;
+        const nodeHeight = 130;
+        const xStep = 250;
+        const yStep = 170;
+        const isOccupied = (candidateX, candidateY) => {
+          return state.scenario.nodes.some((node) => {
+            if (node.id === ignoreNodeId) return false;
+            const pos = state.uiPositions[node.id];
+            if (!pos) return false;
+            const overlapX = Math.abs(pos.x - candidateX) < nodeWidth;
+            const overlapY = Math.abs(pos.y - candidateY) < nodeHeight;
+            return overlapX && overlapY;
+          });
+        };
+
+        for (let i = 0; i < 200; i += 1) {
+          const col = i % 6;
+          const row = Math.floor(i / 6);
+          const x = preferred.x + col * xStep;
+          const y = preferred.y + row * yStep;
+          if (!isOccupied(x, y)) {
+            return { x, y };
+          }
+        }
+        return { x: preferred.x, y: preferred.y };
+      }
+
+      function markScenarioDirty() {
+        state.autosaveDirty = true;
+        scheduleAutosave();
+      }
+
+      function scheduleAutosave() {
+        if (state.autosaveTimer) {
+          clearTimeout(state.autosaveTimer);
+        }
+        state.autosaveTimer = setTimeout(() => {
+          state.autosaveTimer = null;
+          flushAutosave();
+        }, 1200);
+      }
+
+      async function flushAutosave() {
+        if (!state.autosaveDirty) {
+          return;
+        }
+        if (state.autosaveInFlight) {
+          state.autosaveQueued = true;
+          return;
+        }
+
+        state.autosaveInFlight = true;
+        state.autosaveDirty = false;
+        const saved = await saveScenario({ silent: true });
+        state.autosaveInFlight = false;
+
+        if (saved) {
+          if (state.autosaveHadError) {
+            log("Auto-save recovered.");
+          }
+          state.autosaveHadError = false;
+        } else {
+          state.autosaveDirty = true;
+          if (!state.autosaveHadError) {
+            log("Auto-save failed. Check project setup/permissions.", true);
+          }
+          state.autosaveHadError = true;
+        }
+
+        if (state.autosaveDirty || state.autosaveQueued) {
+          state.autosaveQueued = false;
+          scheduleAutosave();
+        }
+      }
+
+      function currentProjectRef() {
+        return state.projectId || (el.projectSlug.value || "").trim() || "default";
+      }
+
+      function inferAssetKindFromFile(file) {
+        const mime = String(file?.type || "").toLowerCase();
+        if (mime.startsWith("audio/")) {
+          return "music";
+        }
+        if (mime.startsWith("image/")) {
+          return "background";
+        }
+        return null;
+      }
+
+      async function uploadAssetFile(file, kind) {
+        if (!(file instanceof File)) {
+          return { ok: false, message: "No file selected." };
+        }
+        const ref = currentProjectRef();
+        const form = new FormData();
+        form.set("kind", kind);
+        form.set("file", file);
+        try {
+          const res = await fetch(`/api/projects/${encodeURIComponent(ref)}/assets`, {
+            method: "POST",
+            headers: headers({ json: false }),
+            body: form
+          });
+          const body = await res.json();
+          if (!res.ok || !body?.url) {
+            return { ok: false, message: `${body?.code ?? "UPLOAD_FAILED"}: ${body?.message ?? "Asset upload failed."}` };
+          }
+          return { ok: true, url: body.url };
+        } catch (error) {
+          return { ok: false, message: `Asset upload failed: ${error.message}` };
+        }
+      }
+
+      async function uploadSelectedAssetNodeFile(file) {
+        const node = state.scenario.nodes.find((n) => n.id === state.selectedNodeId);
+        if (!node || node.type !== "asset") {
+          log("Select an asset node first.", true);
+          return;
+        }
+        const kind = inferAssetKindFromFile(file);
+        if (!kind) {
+          log("Only image/audio files are supported.", true);
+          return;
+        }
+        const result = await uploadAssetFile(file, kind);
+        if (!result.ok) {
+          log(result.message, true);
+          return;
+        }
+        el.assetKind.value = kind;
+        el.assetUrl.value = result.url;
+        if (!el.assetLabel.value.trim()) {
+          el.assetLabel.value = file.name || "asset";
+        }
+        applyNodeChanges({ silent: true });
+        log(`Asset uploaded: ${file.name}`);
+      }
+
+      function applyAssetNodeToScene(assetNodeId, sceneNodeId, options = {}) {
+        const { silent = false } = options;
+        const assetNode = state.scenario.nodes.find((n) => n.id === assetNodeId);
+        const sceneNode = state.scenario.nodes.find((n) => n.id === sceneNodeId);
+        if (!assetNode || !sceneNode) {
+          return;
+        }
+        if (assetNode.type !== "asset") {
+          return;
+        }
+        if (sceneNode.type !== "scene") {
+          log("Asset node can only be dropped on a scene node.", true);
+          return;
+        }
+        const kind = assetNode.data?.assetKind;
+        const url = (assetNode.data?.url || "").trim();
+        if (!url) {
+          log("Asset node has no URL.", true);
+          return;
+        }
+
+        sceneNode.data = sceneNode.data || {};
+        sceneNode.data.assetLinks = sceneNode.data.assetLinks || {};
+        if (kind === "background") {
+          sceneNode.data.background = url;
+          sceneNode.data.assetLinks.background = assetNode.id;
+        } else if (kind === "character") {
+          const existingCharacters = getSceneCharacters(sceneNode);
+          const occupiedSlots = new Set(existingCharacters.map((character) => character.slot));
+          const slot = ["left", "center", "right"].find((candidate) => !occupiedSlots.has(candidate)) || "right";
+          const nextCharacters = existingCharacters.filter((character) => character.slot !== slot);
+          nextCharacters.push({ slot, image: url });
+          setSceneCharacters(sceneNode, nextCharacters);
+          delete sceneNode.data.characterImage;
+          const linkedCharacters = Array.isArray(sceneNode.data.assetLinks.character)
+            ? sceneNode.data.assetLinks.character.filter(Boolean)
+            : (sceneNode.data.assetLinks.character ? [sceneNode.data.assetLinks.character] : []);
+          if (!linkedCharacters.includes(assetNode.id)) {
+            linkedCharacters.push(assetNode.id);
+          }
+          sceneNode.data.assetLinks.character = linkedCharacters;
+        } else if (kind === "music") {
+          sceneNode.data.music = url;
+          sceneNode.data.assetLinks.music = assetNode.id;
+        } else {
+          log("Unsupported asset kind.", true);
+          return;
+        }
+
+        if (state.selectedNodeId === sceneNode.id) {
+          selectNode(sceneNode.id);
+        } else {
+          renderNodes();
+        }
+        persistDraft();
+        markScenarioDirty();
+        if (!silent) {
+          log(`Applied ${kind} asset to ${sceneNode.id}`);
+        }
+      }
+
+      function applyAssetNodeToScenes(assetNodeId, sceneIds) {
+        const uniqueSceneIds = [...new Set((sceneIds || []).filter(Boolean))];
+        if (uniqueSceneIds.length === 0) {
+          log("적용할 씬이 없습니다.", true);
+          return;
+        }
+        let applied = 0;
+        for (const sceneId of uniqueSceneIds) {
+          const sceneNode = state.scenario.nodes.find((n) => n.id === sceneId);
+          if (!sceneNode || sceneNode.type !== "scene") {
+            continue;
+          }
+          applyAssetNodeToScene(assetNodeId, sceneId, { silent: true });
+          applied += 1;
+        }
+        if (applied === 0) {
+          log("선택된 씬에 적용할 수 없습니다.", true);
+          return;
+        }
+        log(`Asset applied to ${applied} scene node(s).`);
+      }
+
       function ensureNodePosition(nodeId, fallbackIndex = 0) {
         if (state.uiPositions[nodeId]) {
           return state.uiPositions[nodeId];
         }
-        const position = {
+        const preferred = {
           x: 24 + (fallbackIndex % 4) * 250,
           y: 24 + Math.floor(fallbackIndex / 4) * 170
         };
+        const position = findAvailableNodePosition(preferred, nodeId);
         state.uiPositions[nodeId] = position;
         return position;
       }
@@ -594,28 +1048,81 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
       function getEdgeList() {
         const edges = [];
         for (const node of state.scenario.nodes) {
-          if (node.type === "scene" && node.next) {
-            edges.push({ from: node.id, to: node.next, label: "next" });
-          }
-          if (node.type === "jump" && node.data?.to) {
-            edges.push({ from: node.id, to: node.data.to, label: "jump" });
-          }
-          if (node.type === "choice") {
-            (node.data?.options ?? []).forEach((option, index) => {
-              if (option?.to) {
-                edges.push({ from: node.id, to: option.to, label: `opt${index + 1}` });
-              }
-            });
-          }
-          if (node.type === "condition") {
-            (node.data?.branches ?? []).forEach((branch, index) => {
-              if (branch?.to) {
-                edges.push({ from: node.id, to: branch.to, label: `br${index + 1}` });
-              }
+          if (node.type === "scene") {
+            const targets = getSceneTargets(node);
+            targets.forEach((to, index) => {
+              if (!to) return;
+              const label = targets.length >= 2 ? `opt${index + 1}` : "next";
+              edges.push({ from: node.id, to, label });
             });
           }
         }
         return edges;
+      }
+
+      function autoLayoutNodes() {
+        const nodes = state.scenario.nodes || [];
+        if (nodes.length === 0) {
+          return;
+        }
+
+        const adjacency = new Map();
+        for (const node of nodes) {
+          adjacency.set(node.id, []);
+        }
+        for (const edge of getEdgeList()) {
+          if (!adjacency.has(edge.from)) adjacency.set(edge.from, []);
+          adjacency.get(edge.from).push(edge.to);
+        }
+
+        const depthById = new Map();
+        const rootId = state.scenario.entryNodeId || nodes[0]?.id;
+        const queue = [];
+        if (rootId) {
+          depthById.set(rootId, 0);
+          queue.push(rootId);
+        }
+
+        while (queue.length > 0) {
+          const id = queue.shift();
+          const currentDepth = depthById.get(id) ?? 0;
+          for (const nextId of adjacency.get(id) || []) {
+            if (!depthById.has(nextId)) {
+              depthById.set(nextId, currentDepth + 1);
+              queue.push(nextId);
+            }
+          }
+        }
+
+        let fallbackDepth = 0;
+        for (const node of nodes) {
+          if (!depthById.has(node.id)) {
+            depthById.set(node.id, fallbackDepth + 1);
+            fallbackDepth += 1;
+          }
+        }
+
+        const lanes = new Map();
+        for (const node of nodes) {
+          const depth = depthById.get(node.id) ?? 0;
+          if (!lanes.has(depth)) lanes.set(depth, []);
+          lanes.get(depth).push(node.id);
+        }
+
+        const xGap = 280;
+        const yGap = 180;
+        for (const [depth, ids] of lanes.entries()) {
+          ids.forEach((id, rowIndex) => {
+            state.uiPositions[id] = {
+              x: 24 + depth * xGap,
+              y: 24 + rowIndex * yGap
+            };
+          });
+        }
+
+        renderNodes();
+        persistDraft();
+        log("Auto layout applied.");
       }
 
       function connectNodes(fromId, toId) {
@@ -623,41 +1130,25 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
         if (!source) {
           return;
         }
-        source.data = source.data || {};
-        if (source.type === "scene") {
-          source.next = toId;
-        } else if (source.type === "jump") {
-          source.data.to = toId;
-        } else if (source.type === "choice") {
-          const options = Array.isArray(source.data.options) ? source.data.options : [];
-          const alreadyLinked = options.some((opt) => opt?.to === toId);
-          if (alreadyLinked) {
-            log(`Choice already linked to ${toId}`);
-            return;
-          }
-          if (options.length >= 8) {
-            log("Choice options are limited to 8.", true);
-            return;
-          }
-          const nextIndex = options.length + 1;
-          options.push({
-            id: `opt_${nextIndex}`,
-            label: `선택 ${nextIndex}`,
-            to: toId
-          });
-          source.data.options = options;
-        } else if (source.type === "condition") {
-          const branches = source.data.branches || [];
-          if (branches.length === 0) {
-            source.data.branches = [{ when: "default", to: toId }];
-          } else {
-            branches[0].to = toId;
-          }
-        } else {
-          log(`${source.type} node does not support outgoing links.`, true);
+        const target = state.scenario.nodes.find((n) => n.id === toId);
+        if (!target) {
           return;
         }
+        if (source.type !== "scene") {
+          log("Only scene nodes can connect to next nodes.", true);
+          return;
+        }
+        if (target.type !== "scene") {
+          log("Scene node can only connect to scene node.", true);
+          return;
+        }
+        const targets = getSceneTargets(source);
+        if (!targets.includes(toId)) {
+          targets.push(toId);
+        }
+        setSceneTargets(source, targets);
         persistDraft();
+        markScenarioDirty();
         if (state.selectedNodeId === source.id) {
           selectNode(source.id);
         } else {
@@ -682,6 +1173,39 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
           return null;
         }
         return nodeEl.getAttribute("data-node-id");
+      }
+
+      function getSelectedSceneIdsForAssetEdges() {
+        if (state.multiSelectedSceneIds.length > 0) {
+          return state.multiSelectedSceneIds.filter((id) => state.scenario.nodes.some((n) => n.id === id && n.type === "scene"));
+        }
+        if (state.selectedNodeId) {
+          const node = state.scenario.nodes.find((n) => n.id === state.selectedNodeId);
+          if (node?.type === "scene") {
+            return [node.id];
+          }
+        }
+        return [];
+      }
+
+      function setMultiSceneSelection(ids) {
+        const sceneIds = new Set(
+          (ids || []).filter((id) => state.scenario.nodes.some((n) => n.id === id && n.type === "scene"))
+        );
+        state.multiSelectedSceneIds = [...sceneIds];
+      }
+
+      function toggleSceneSelection(id) {
+        if (!state.scenario.nodes.some((n) => n.id === id && n.type === "scene")) {
+          return;
+        }
+        const selected = new Set(state.multiSelectedSceneIds);
+        if (selected.has(id)) {
+          selected.delete(id);
+        } else {
+          selected.add(id);
+        }
+        state.multiSelectedSceneIds = [...selected];
       }
 
       function renderNodes() {
@@ -727,6 +1251,43 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
           edgeLayer.appendChild(label);
         }
 
+        const selectedScenesForAssetEdges = getSelectedSceneIdsForAssetEdges();
+        for (const sceneId of selectedScenesForAssetEdges) {
+          const sceneNode = state.scenario.nodes.find((n) => n.id === sceneId && n.type === "scene");
+          if (!sceneNode) continue;
+          const links = sceneNode.data?.assetLinks || {};
+          for (const [kind, assetNodeId] of Object.entries(links)) {
+            const linkedIds = Array.isArray(assetNodeId) ? assetNodeId : [assetNodeId];
+            for (const linkedId of linkedIds.filter(Boolean)) {
+              const assetNode = state.scenario.nodes.find((n) => n.id === linkedId && n.type === "asset");
+              if (!assetNode) continue;
+              const fromPos = state.uiPositions[sceneId];
+              const toPos = state.uiPositions[linkedId];
+              if (!fromPos || !toPos) continue;
+
+              const x1 = fromPos.x + 220;
+              const y1 = fromPos.y + 30;
+              const x2 = toPos.x;
+              const y2 = toPos.y + 30;
+
+              const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+              line.setAttribute("x1", String(x1));
+              line.setAttribute("y1", String(y1));
+              line.setAttribute("x2", String(x2));
+              line.setAttribute("y2", String(y2));
+              line.setAttribute("class", "edge-line-asset");
+              edgeLayer.appendChild(line);
+
+              const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+              label.setAttribute("x", String((x1 + x2) / 2));
+              label.setAttribute("y", String((y1 + y2) / 2 - 6));
+              label.setAttribute("class", "edge-label-asset");
+              label.textContent = `asset:${kind}`;
+              edgeLayer.appendChild(label);
+            }
+          }
+        }
+
         if (state.connectDrag) {
           const fromPos = state.uiPositions[state.connectDrag.fromId];
           if (fromPos) {
@@ -745,24 +1306,52 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
           }
         }
 
+        if (state.marquee) {
+          const x = Math.min(state.marquee.x1, state.marquee.x2);
+          const y = Math.min(state.marquee.y1, state.marquee.y2);
+          const w = Math.abs(state.marquee.x2 - state.marquee.x1);
+          const h = Math.abs(state.marquee.y2 - state.marquee.y1);
+          const box = document.createElement("div");
+          box.className = "marquee-select";
+          box.style.left = `${x}px`;
+          box.style.top = `${y}px`;
+          box.style.width = `${w}px`;
+          box.style.height = `${h}px`;
+          content.appendChild(box);
+        }
+
         for (const node of state.scenario.nodes) {
           const div = document.createElement("div");
-          const isSelected = state.selectedNodeId === node.id || state.connectFromId === node.id;
+          const isMultiSelectedScene = node.type === "scene" && state.multiSelectedSceneIds.includes(node.id);
+          const isSelected = state.selectedNodeId === node.id || state.connectFromId === node.id || isMultiSelectedScene;
           const isDragging = state.draggingNodeId === node.id;
           const isConnectTarget = state.connectHoverNodeId === node.id;
-          div.className = `node ${isSelected ? "selected" : ""} ${isDragging ? "dragging" : ""} ${isConnectTarget ? "connect-target" : ""}`;
+          const isAssetDropTarget = state.assetDropNodeId === node.id;
+          const nodeTypeClass = node.type === "asset" ? "asset-node" : "scene-node";
+          div.className = `node ${nodeTypeClass} ${isSelected ? "selected" : ""} ${isDragging ? "dragging" : ""} ${isConnectTarget ? "connect-target" : ""} ${isAssetDropTarget ? "asset-drop-target" : ""}`;
           div.setAttribute("data-node-id", node.id);
           const pos = state.uiPositions[node.id];
           div.style.left = `${pos.x}px`;
           div.style.top = `${pos.y}px`;
+          const sceneTargets = node.type === "scene" ? getSceneTargets(node) : [];
+          const sceneState = node.type === "scene"
+            ? (sceneTargets.length === 0 ? "ending" : (sceneTargets.length >= 2 ? "option" : "normal"))
+            : "-";
+          const nodePreview = node.type === "asset"
+            ? (node.data?.label || node.data?.url || "(asset)")
+            : (node.data?.text || "(no text)");
+          const nodeNextDisplay = node.type === "scene" ? (sceneTargets[0] || "-") : "-";
+          const nodeAssetDisplay = node.type === "asset"
+            ? `${node.data?.assetKind || "-"}:${node.data?.url ? "y" : "-"}`
+            : "-";
           div.innerHTML = `
             <div class="node-meta"><span>${node.id}</span><span>${node.type}</span></div>
-            <div class="node-text">${node.data?.text ?? node.data?.prompt ?? "(no text)"}</div>
+            <div class="node-text">${nodePreview}</div>
             <div class="node-row">
-              <span class="mono">next: ${node.next ?? node.data?.to ?? "-"} / opts:${node.type === "choice" ? (node.data?.options?.length ?? 0) : "-"}</span>
-              <span class="connect-handle" data-role="connect-handle" title="Drag to connect"></span>
+              <span class="mono">next: ${nodeNextDisplay} / scene:${sceneState} / asset:${nodeAssetDisplay}</span>
+              <span class="connect-handle" data-role="connect-handle" title="Drag to connect/apply"></span>
             </div>
-            <div class="mono">bg:${node.data?.background ? "y" : "-"} char:${node.data?.characterImage ? "y" : "-"} bgm:${node.data?.music ? "y" : "-"} spd:${Number.isFinite(Number(node.data?.textSpeed)) ? Math.round(Number(node.data?.textSpeed)) : "-"}</div>
+            <div class="mono">bg:${node.data?.background ? "y" : "-"} char:${getSceneCharacters(node).length > 0 || node.data?.characterImage ? "y" : "-"} bgm:${node.data?.music ? "y" : "-"} spd:${Number.isFinite(Number(node.data?.textSpeed)) ? Math.round(Number(node.data?.textSpeed)) : "-"}</div>
           `;
           div.onpointerdown = (event) => {
             const isHandle = event.target?.closest?.("[data-role='connect-handle']");
@@ -788,7 +1377,18 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
                 window.removeEventListener("pointermove", onMove);
                 window.removeEventListener("pointerup", onUp);
                 if (state.connectHoverNodeId && state.connectHoverNodeId !== node.id) {
-                  connectNodes(node.id, state.connectHoverNodeId);
+                  if (node.type === "scene") {
+                    connectNodes(node.id, state.connectHoverNodeId);
+                  } else if (node.type === "asset") {
+                    const selectedScenes = state.multiSelectedSceneIds.length > 0
+                      ? state.multiSelectedSceneIds
+                      : (state.lastSelectedSceneId ? [state.lastSelectedSceneId] : []);
+                    if (selectedScenes.length > 0) {
+                      applyAssetNodeToScenes(node.id, selectedScenes);
+                    } else {
+                      applyAssetNodeToScene(node.id, state.connectHoverNodeId);
+                    }
+                  }
                 }
                 state.connectDrag = null;
                 state.connectHoverNodeId = null;
@@ -804,8 +1404,13 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
             state.draggingNodeId = node.id;
             const start = canvasPointFromClient(event.clientX, event.clientY);
             const origin = { ...state.uiPositions[node.id] };
+            const toggleMulti = Boolean(event.ctrlKey || event.metaKey);
             let dragged = false;
+            let lastClientX = event.clientX;
+            let lastClientY = event.clientY;
             const onMove = (moveEvent) => {
+              lastClientX = moveEvent.clientX;
+              lastClientY = moveEvent.clientY;
               const current = canvasPointFromClient(moveEvent.clientX, moveEvent.clientY);
               const dx = current.x - start.x;
               const dy = current.y - start.y;
@@ -816,16 +1421,26 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
                 x: Math.max(8, origin.x + dx),
                 y: Math.max(8, origin.y + dy)
               };
+              const hoveredNodeId = findNodeIdFromClient(moveEvent.clientX, moveEvent.clientY);
+              state.assetDropNodeId = hoveredNodeId && hoveredNodeId !== node.id ? hoveredNodeId : null;
               renderNodes();
             };
             const onUp = () => {
               window.removeEventListener("pointermove", onMove);
               window.removeEventListener("pointerup", onUp);
               state.draggingNodeId = null;
+              state.assetDropNodeId = null;
               if (dragged) {
                 persistDraft();
               } else {
-                selectNode(node.id);
+                if (node.type !== "scene") {
+                  selectNode(node.id, { preserveMulti: true });
+                } else if (toggleMulti) {
+                  toggleSceneSelection(node.id);
+                  selectNode(node.id, { preserveMulti: true });
+                } else {
+                  selectNode(node.id);
+                }
               }
               renderNodes();
             };
@@ -834,6 +1449,78 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
           };
           content.appendChild(div);
         }
+
+        const startMarqueeSelection = (event) => {
+          if (event.target?.closest?.(".node")) {
+            return;
+          }
+          if (event.button !== 0) {
+            return;
+          }
+          event.preventDefault();
+          const start = canvasPointFromClient(event.clientX, event.clientY);
+          const additive = Boolean(event.ctrlKey || event.metaKey);
+          const baseSelection = additive ? new Set(state.multiSelectedSceneIds) : new Set();
+          state.marquee = { x1: start.x, y1: start.y, x2: start.x, y2: start.y };
+          renderNodes();
+
+          const onMove = (moveEvent) => {
+            const current = canvasPointFromClient(moveEvent.clientX, moveEvent.clientY);
+            state.marquee = { x1: start.x, y1: start.y, x2: current.x, y2: current.y };
+            renderNodes();
+          };
+
+          const onUp = () => {
+            window.removeEventListener("pointermove", onMove);
+            window.removeEventListener("pointerup", onUp);
+            const marquee = state.marquee;
+            state.marquee = null;
+            if (!marquee) {
+              renderNodes();
+              return;
+            }
+            const x1 = Math.min(marquee.x1, marquee.x2);
+            const y1 = Math.min(marquee.y1, marquee.y2);
+            const x2 = Math.max(marquee.x1, marquee.x2);
+            const y2 = Math.max(marquee.y1, marquee.y2);
+            const isClick = Math.abs(marquee.x2 - marquee.x1) < 4 && Math.abs(marquee.y2 - marquee.y1) < 4;
+
+            if (isClick) {
+              if (!additive) {
+                setMultiSceneSelection([]);
+              }
+              renderNodes();
+              return;
+            }
+
+            const selectedByBox = state.scenario.nodes
+              .filter((n) => n.type === "scene")
+              .filter((n) => {
+                const p = state.uiPositions[n.id];
+                if (!p) return false;
+                const nx1 = p.x;
+                const ny1 = p.y;
+                const nx2 = p.x + 220;
+                const ny2 = p.y + 130;
+                return nx1 <= x2 && nx2 >= x1 && ny1 <= y2 && ny2 >= y1;
+              })
+              .map((n) => n.id);
+
+            const merged = new Set(baseSelection);
+            selectedByBox.forEach((id) => merged.add(id));
+            setMultiSceneSelection([...merged]);
+            if (state.multiSelectedSceneIds.length === 1) {
+              selectNode(state.multiSelectedSceneIds[0], { preserveMulti: true });
+            } else {
+              renderNodes();
+            }
+          };
+
+          window.addEventListener("pointermove", onMove);
+          window.addEventListener("pointerup", onUp);
+        };
+        content.onpointerdown = startMarqueeSelection;
+        el.nodeCanvas.onpointerdown = startMarqueeSelection;
       }
 
       function setFieldVisible(element, visible) {
@@ -842,96 +1529,103 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
 
       function updateNodeFormByType(node) {
         const isScene = node?.type === "scene";
-        const isChoice = node?.type === "choice";
-        const isEnding = node?.type === "ending";
-        el.nodeTextLabel.textContent = isChoice ? "Choice Prompt" : isEnding ? "Ending Title" : "Node Text";
+        const isAsset = node?.type === "asset";
+        el.nodeTextLabel.textContent = "Node Text";
+        setFieldVisible(el.nodeTextField, isScene);
         setFieldVisible(el.nodeSpeakerField, isScene);
         setFieldVisible(el.nodeTextSpeedField, isScene);
-        setFieldVisible(el.nodeNextField, isScene);
-        setFieldVisible(el.choiceOptionsField, isChoice);
+        setFieldVisible(el.nodeNextField, false);
+        setFieldVisible(el.assetKindField, isAsset);
+        setFieldVisible(el.assetLabelField, isAsset);
+        setFieldVisible(el.assetUrlField, isAsset);
+        setFieldVisible(el.assetUpload, isAsset);
+        setFieldVisible(el.applyAssetToLastScene, isAsset);
+        setFieldVisible(el.nodeBackground.parentElement, isScene);
+        setFieldVisible(el.nodeCharacterLeft.parentElement, isScene);
+        setFieldVisible(el.nodeCharacterCenter.parentElement, isScene);
+        setFieldVisible(el.nodeCharacterRight.parentElement, isScene);
+        setFieldVisible(el.nodeMusic.parentElement, isScene);
       }
 
-      function renderChoiceOptionsEditor(node) {
-        el.choiceOptionsEditor.innerHTML = "";
-        const options = Array.isArray(node?.data?.options) ? node.data.options : [];
-        if (options.length === 0) {
-          const empty = document.createElement("div");
-          empty.className = "mono";
-          empty.textContent = "No options yet. Add one.";
-          el.choiceOptionsEditor.appendChild(empty);
-          return;
-        }
-
-        options.forEach((option, index) => {
-          const row = document.createElement("div");
-          row.className = "choice-option-row";
-          row.dataset.optionId = option?.id || `opt_${index + 1}`;
-          const labelInput = document.createElement("input");
-          labelInput.placeholder = `옵션명 ${index + 1}`;
-          labelInput.value = option?.label || "";
-          labelInput.dataset.field = "label";
-          const toInput = document.createElement("input");
-          toInput.placeholder = "target node id";
-          toInput.value = option?.to || "";
-          toInput.dataset.field = "to";
-          const removeButton = document.createElement("button");
-          removeButton.textContent = "Remove";
-          removeButton.className = "warn";
-          removeButton.onclick = () => {
-            row.remove();
-            if (el.choiceOptionsEditor.children.length === 0) {
-              renderChoiceOptionsEditor({ data: { options: [] } });
-            }
-            applyNodeChanges({ silent: true });
-          };
-          row.appendChild(labelInput);
-          row.appendChild(toInput);
-          row.appendChild(removeButton);
-          el.choiceOptionsEditor.appendChild(row);
-        });
-      }
-
-      function readChoiceOptionsFromEditor() {
-        const rows = [...el.choiceOptionsEditor.querySelectorAll(".choice-option-row")];
-        const options = [];
-        rows.forEach((row, index) => {
-          const label = (row.querySelector("[data-field='label']")?.value || "").trim();
-          const to = (row.querySelector("[data-field='to']")?.value || "").trim();
-          if (!label && !to) {
-            return;
-          }
-          options.push({
-            id: row.dataset.optionId || `opt_${index + 1}`,
-            label: label || `선택 ${index + 1}`,
-            to: to || null
-          });
-        });
-        return options.slice(0, 8);
-      }
-
-      function selectNode(id) {
+      function selectNode(id, options = {}) {
+        const { preserveMulti = false } = options;
         state.selectedNodeId = id;
         const node = state.scenario.nodes.find((n) => n.id === id);
         if (!node) return;
+        if (!preserveMulti) {
+          if (node.type === "scene") {
+            setMultiSceneSelection([node.id]);
+          } else {
+            setMultiSceneSelection([]);
+          }
+        }
+        if (node.type === "scene") {
+          state.lastSelectedSceneId = node.id;
+        }
         updateNodeFormByType(node);
         el.selectedNodeLabel.textContent = `${node.id} (${node.type})`;
-        if (node.type === "choice") {
-          el.nodeText.value = node.data?.prompt ?? "";
+        if (node.type === "asset") {
+          el.nodeText.value = "";
           el.nodeSpeaker.value = "";
           el.nodeTextSpeed.value = "";
           el.nodeNext.value = "";
-          renderChoiceOptionsEditor(node);
+          el.assetKind.value = node.data?.assetKind || "background";
+          el.assetLabel.value = node.data?.label || "";
+          el.assetUrl.value = node.data?.url || "";
         } else {
-          el.nodeText.value = node.type === "ending" ? (node.data?.title ?? "") : (node.data?.text ?? "");
+          const sceneTargets = getSceneTargets(node);
+          el.nodeText.value = node.data?.text ?? "";
           el.nodeSpeaker.value = node.data?.speaker ?? "";
           el.nodeTextSpeed.value = Number.isFinite(Number(node.data?.textSpeed)) ? String(Math.round(Number(node.data?.textSpeed))) : "";
-          el.nodeNext.value = node.next ?? node.data?.to ?? "";
-          renderChoiceOptionsEditor({ data: { options: [] } });
+          el.nodeNext.value = sceneTargets[0] ?? "";
+          el.assetKind.value = "background";
+          el.assetLabel.value = "";
+          el.assetUrl.value = "";
         }
         el.nodeBackground.value = node.data?.background ?? "";
-        el.nodeCharacterImage.value = node.data?.characterImage ?? "";
+        const characters = getSceneCharacters(node);
+        el.nodeCharacterLeft.value = characters.find((character) => character.slot === "left")?.image || "";
+        el.nodeCharacterCenter.value = characters.find((character) => character.slot === "center")?.image || "";
+        el.nodeCharacterRight.value = characters.find((character) => character.slot === "right")?.image || "";
         el.nodeMusic.value = node.data?.music ?? "";
         renderNodes();
+      }
+
+      function applySelectedAssetToLastScene() {
+        const assetNode = state.scenario.nodes.find((n) => n.id === state.selectedNodeId);
+        if (!assetNode || assetNode.type !== "asset") {
+          log("Select an asset node first.", true);
+          return;
+        }
+        const selectedScenes = state.multiSelectedSceneIds.length > 0
+          ? state.multiSelectedSceneIds
+          : (state.lastSelectedSceneId ? [state.lastSelectedSceneId] : []);
+        if (selectedScenes.length === 0) {
+          log("적용할 씬을 먼저 선택하세요.", true);
+          return;
+        }
+        applyAssetNodeToScenes(assetNode.id, selectedScenes);
+      }
+
+      function getSceneTargets(node) {
+        if (!node || node.type !== "scene") {
+          return [];
+        }
+        const stored = Array.isArray(node.data?.targets) ? node.data.targets.filter(Boolean) : [];
+        if (stored.length > 0) {
+          return [...new Set(stored)];
+        }
+        return node.next ? [node.next] : [];
+      }
+
+      function setSceneTargets(node, targets) {
+        if (!node || node.type !== "scene") {
+          return;
+        }
+        const unique = [...new Set((targets || []).filter(Boolean))];
+        node.data = node.data || {};
+        node.data.targets = unique;
+        node.next = unique[0] || null;
       }
 
       function applyNodeChanges(options = {}) {
@@ -942,11 +1636,17 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
         const speaker = (el.nodeSpeaker.value || "").trim();
         const textSpeedInput = (el.nodeTextSpeed.value || "").trim();
         const background = (el.nodeBackground.value || "").trim();
-        const characterImage = (el.nodeCharacterImage.value || "").trim();
+        const characterLeft = (el.nodeCharacterLeft.value || "").trim();
+        const characterCenter = (el.nodeCharacterCenter.value || "").trim();
+        const characterRight = (el.nodeCharacterRight.value || "").trim();
         const music = (el.nodeMusic.value || "").trim();
+        const assetKind = (el.assetKind.value || "background").trim();
+        const assetLabel = (el.assetLabel.value || "").trim();
+        const assetUrl = (el.assetUrl.value || "").trim();
         if (node.type === "scene") {
           node.data.text = el.nodeText.value;
-          node.next = el.nodeNext.value || null;
+          const sceneTargets = getSceneTargets(node);
+          setSceneTargets(node, sceneTargets);
           if (speaker) {
             node.data.speaker = speaker;
           } else {
@@ -960,43 +1660,45 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
               node.data.textSpeed = Math.max(0, Math.min(96, Math.round(rawSpeed)));
             }
           }
-          delete node.data.prompt;
-          delete node.data.options;
-        } else if (node.type === "jump") {
-          node.data.to = el.nodeNext.value || null;
-          delete node.data.textSpeed;
-        } else if (node.type === "ending") {
-          node.data.title = el.nodeText.value || node.data.title || "Ending";
-          delete node.data.textSpeed;
-          delete node.data.prompt;
-          delete node.data.options;
-        } else if (node.type === "choice") {
-          node.data.prompt = el.nodeText.value || "선택";
-          node.data.options = readChoiceOptionsFromEditor();
+          delete node.data.assetKind;
+          delete node.data.label;
+          delete node.data.url;
+        } else if (node.type === "asset") {
+          node.data.assetKind = ["background", "character", "music"].includes(assetKind) ? assetKind : "background";
+          node.data.label = assetLabel || "asset";
+          node.data.url = assetUrl;
           delete node.next;
           delete node.data.text;
           delete node.data.speaker;
           delete node.data.textSpeed;
+          delete node.data.background;
+          delete node.data.characters;
+          delete node.data.characterImage;
+          delete node.data.music;
         } else {
           delete node.data.textSpeed;
         }
-        if (background) {
-          node.data.background = background;
-        } else {
-          delete node.data.background;
-        }
-        if (characterImage) {
-          node.data.characterImage = characterImage;
-        } else {
+        if (node.type === "scene") {
+          if (background) {
+            node.data.background = background;
+          } else {
+            delete node.data.background;
+          }
+          setSceneCharacters(node, [
+            { slot: "left", image: characterLeft },
+            { slot: "center", image: characterCenter },
+            { slot: "right", image: characterRight }
+          ]);
           delete node.data.characterImage;
-        }
-        if (music) {
-          node.data.music = music;
-        } else {
-          delete node.data.music;
+          if (music) {
+            node.data.music = music;
+          } else {
+            delete node.data.music;
+          }
         }
         renderNodes();
         persistDraft();
+        markScenarioDirty();
         if (!silent) {
           log(`Applied changes to ${node.id}`);
         }
@@ -1020,17 +1722,23 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
         }
 
         for (const node of state.scenario.nodes) {
-          if (node.type === "scene" && node.next === removeId) {
-            node.next = null;
-          }
-          if (node.type === "jump" && node.data?.to === removeId) {
-            node.data.to = null;
-          }
-          if (node.type === "choice" && Array.isArray(node.data?.options)) {
-            node.data.options = node.data.options.filter((o) => o.to !== removeId);
-          }
-          if (node.type === "condition" && Array.isArray(node.data?.branches)) {
-            node.data.branches = node.data.branches.filter((b) => b.to !== removeId);
+          if (node.type === "scene") {
+            const targets = getSceneTargets(node).filter((id) => id !== removeId);
+            setSceneTargets(node, targets);
+            if (node.data?.assetLinks && typeof node.data.assetLinks === "object") {
+              for (const [kind, linkedId] of Object.entries(node.data.assetLinks)) {
+                if (linkedId === removeId) {
+                  delete node.data.assetLinks[kind];
+                } else if (Array.isArray(linkedId)) {
+                  const filtered = linkedId.filter((id) => id !== removeId);
+                  if (filtered.length > 0) {
+                    node.data.assetLinks[kind] = filtered;
+                  } else {
+                    delete node.data.assetLinks[kind];
+                  }
+                }
+              }
+            }
           }
         }
 
@@ -1043,63 +1751,80 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
           selectNode(state.selectedNodeId);
         }
         persistDraft();
+        markScenarioDirty();
         log(`Deleted node ${removeId}`);
       }
 
-      function addNode(type) {
+      function addNode(type, payload = null) {
         const id = `n_${type}_${Math.random().toString(36).slice(2, 6)}`;
         const node = { id, type, data: {} };
+        let previousLinkedTargetId = null;
         if (type === "scene") {
           node.data.text = "새 장면";
           node.data.textSpeed = 24;
-          node.next = null;
+          setSceneTargets(node, []);
         }
-        if (type === "choice") {
-          node.data.prompt = "선택지를 고르세요";
-          node.data.options = [{ id: "opt_1", label: "선택 1", to: "n_end" }];
+        if (type === "asset") {
+          node.data.assetKind = payload?.assetKind || "background";
+          node.data.label = payload?.label || "asset";
+          node.data.url = payload?.url || "";
         }
-        if (type === "ending") {
-          node.data.endingId = id;
-          node.data.title = "새 엔딩";
-        }
-        state.scenario.nodes.push(node);
-        renderNodes();
-        selectNode(id);
-        persistDraft();
-      }
+        const selectedIndex = state.scenario.nodes.findIndex((n) => n.id === state.selectedNodeId);
+        const selectedNode = selectedIndex >= 0 ? state.scenario.nodes[selectedIndex] : null;
 
-      el.addChoiceOption.onclick = () => {
-        const node = state.scenario.nodes.find((n) => n.id === state.selectedNodeId);
-        if (!node || node.type !== "choice") {
-          log("Select a choice node first.", true);
-          return;
-        }
-        const currentRows = el.choiceOptionsEditor.querySelectorAll(".choice-option-row").length;
-        if (currentRows >= 8) {
-          log("Choice options are limited to 8.", true);
-          return;
-        }
-        if (el.choiceOptionsEditor.querySelector(".choice-option-row") === null) {
-          el.choiceOptionsEditor.innerHTML = "";
-        }
-        const row = document.createElement("div");
-        row.className = "choice-option-row";
-        row.dataset.optionId = `opt_${currentRows + 1}`;
-        row.innerHTML = `
-          <input data-field="label" placeholder="옵션명 ${currentRows + 1}" />
-          <input data-field="to" placeholder="target node id" />
-          <button class="warn">Remove</button>
-        `;
-        row.querySelector("button").onclick = () => {
-          row.remove();
-          if (el.choiceOptionsEditor.children.length === 0) {
-            renderChoiceOptionsEditor({ data: { options: [] } });
+        if (type === "scene" && selectedNode) {
+          state.scenario.nodes.splice(selectedIndex + 1, 0, node);
+          if (selectedNode.type === "scene") {
+            const selectedTargets = getSceneTargets(selectedNode);
+            previousLinkedTargetId = selectedTargets[0] ?? null;
+            const restTargets = selectedTargets.slice(1);
+            setSceneTargets(selectedNode, [id, ...restTargets]);
+            setSceneTargets(node, previousLinkedTargetId ? [previousLinkedTargetId] : []);
           }
-          applyNodeChanges({ silent: true });
-        };
-        el.choiceOptionsEditor.appendChild(row);
-        applyNodeChanges({ silent: true });
-      };
+        } else if (selectedNode) {
+          state.scenario.nodes.splice(selectedIndex + 1, 0, node);
+        } else {
+          state.scenario.nodes.push(node);
+        }
+
+        if (type === "scene" && selectedNode && previousLinkedTargetId) {
+          const newNodeIndex = state.scenario.nodes.findIndex((n) => n.id === id);
+          const linkedNodeIndex = state.scenario.nodes.findIndex((n) => n.id === previousLinkedTargetId);
+          if (newNodeIndex >= 0 && linkedNodeIndex >= 0 && linkedNodeIndex !== newNodeIndex + 1) {
+            const [linkedNode] = state.scenario.nodes.splice(linkedNodeIndex, 1);
+            const insertIndex = state.scenario.nodes.findIndex((n) => n.id === id) + 1;
+            state.scenario.nodes.splice(insertIndex, 0, linkedNode);
+          }
+        }
+
+        if (selectedNode && state.uiPositions[selectedNode.id]) {
+          const selectedPos = state.uiPositions[selectedNode.id];
+          const preferred = {
+            x: selectedPos.x + 250,
+            y: selectedPos.y
+          };
+          state.uiPositions[id] = findAvailableNodePosition(preferred, id);
+
+          if (type === "scene" && previousLinkedTargetId && state.uiPositions[previousLinkedTargetId]) {
+            const linkedPos = state.uiPositions[previousLinkedTargetId];
+            if (linkedPos.x === state.uiPositions[id].x && linkedPos.y === state.uiPositions[id].y) {
+              state.uiPositions[previousLinkedTargetId] = {
+                x: linkedPos.x + 250,
+                y: linkedPos.y
+              };
+            }
+          }
+        }
+
+        renderNodes();
+        if (type === "scene") {
+          selectNode(id);
+        } else {
+          renderNodes();
+        }
+        persistDraft();
+        markScenarioDirty();
+      }
 
       async function createProject() {
         const res = await fetch("/api/projects", {
@@ -1115,6 +1840,7 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
           state.projectId = body.project?.id || state.projectId;
           el.projectStatus.textContent = `project: ${body.project?.id ?? "created"} (${body.correlationId})`;
           persistDraft();
+          markScenarioDirty();
           log("Project created.");
         } else {
           el.projectStatus.textContent = `${body.code}: ${body.message}`;
@@ -1136,6 +1862,9 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
         const body = await res.json();
         if (res.ok) {
           state.scenarioVersion = body.nextVersion;
+          state.autosaveDirty = false;
+          state.autosaveQueued = false;
+          state.autosaveHadError = false;
           persistDraft();
           if (!silent) {
             log(`Scenario saved. version=${state.scenarioVersion}`);
@@ -1203,27 +1932,37 @@ const playerBaseUrl = import.meta.env.PUBLIC_PLAYER_BASE_URL ?? "http://localhos
       }
 
       function toggleConnectMode() {
-        log("Drag the green handle on a node and drop it on target node to connect.");
+        log("Drag scene node onto scene node to connect next. Drag asset node onto scene node to apply asset.");
       }
 
       el.createProjectBtn.onclick = createProject;
       el.addScene.onclick = () => addNode("scene");
-      el.addChoice.onclick = () => addNode("choice");
-      el.addEnding.onclick = () => addNode("ending");
+      el.addAsset.onclick = () => addNode("asset");
+      el.autoLayout.onclick = autoLayoutNodes;
       el.saveScenario.onclick = saveScenario;
       el.validateScenario.onclick = validateScenario;
       el.connectNode.onclick = toggleConnectMode;
       el.buildSeo.onclick = buildSeo;
       el.openPlayer.onclick = openPlayer;
       el.deleteNode.onclick = deleteSelectedNode;
+      el.assetUpload.onclick = () => el.assetUploadFile.click();
+      el.applyAssetToLastScene.onclick = applySelectedAssetToLastScene;
+      el.assetUploadFile.addEventListener("change", () => {
+        const file = el.assetUploadFile.files?.[0];
+        if (file) {
+          uploadSelectedAssetNodeFile(file);
+        }
+        el.assetUploadFile.value = "";
+      });
       el.projectName.addEventListener("change", persistDraft);
       el.projectSlug.addEventListener("change", persistDraft);
-      [el.nodeText, el.nodeSpeaker, el.nodeTextSpeed, el.nodeNext, el.nodeBackground, el.nodeCharacterImage, el.nodeMusic].forEach((input) => {
+      el.assetKind.addEventListener("change", () => applyNodeChanges({ silent: true }));
+      [el.nodeText, el.nodeSpeaker, el.nodeTextSpeed, el.nodeNext, el.nodeBackground, el.nodeCharacterLeft, el.nodeCharacterCenter, el.nodeCharacterRight, el.nodeMusic, el.assetKind, el.assetLabel, el.assetUrl].forEach((input) => {
         input.addEventListener("input", () => applyNodeChanges({ silent: true }));
       });
-      el.choiceOptionsEditor.addEventListener("input", () => applyNodeChanges({ silent: true }));
 
       restoreDraft();
+      normalizeScenarioNodeTypes();
       renderNodes();
       selectNode(state.scenario.entryNodeId || "n_start");
     </script>

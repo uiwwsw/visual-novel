@@ -1,6 +1,6 @@
 import { e as executeAsync, A as ApiError, E as ErrorCode, r as requireRole, R as Role } from '../../../../chunks/permissions_BskKVdUi.mjs';
 import { s as saveScenario } from '../../../../chunks/routes_CcMLnfyp.mjs';
-import { r as readJson, a as readActorContext } from '../../../../chunks/request-context_BJEMX495.mjs';
+import { a as readJson, r as readActorContext } from '../../../../chunks/request-context_hfaLwzy9.mjs';
 import { i as isSupabaseEnabled, c as getScenarioRecord, d as createScenarioRecord, u as updateScenarioVersion, e as upsertProject, f as upsertScenario } from '../../../../chunks/runtime-store_CjBgLr-g.mjs';
 export { renderers } from '../../../../renderers.mjs';
 

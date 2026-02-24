@@ -14,8 +14,8 @@ const target = `/?project=${projectRef}`;
     <title>Redirecting...</title>
   </head>
   <body>
-    <script is:inline>
-      location.replace({JSON.stringify(target)});
+    <script define:vars={{ target }}>
+      location.replace(target);
     </script>
     <p>Redirecting to project player...</p>
   </body>
