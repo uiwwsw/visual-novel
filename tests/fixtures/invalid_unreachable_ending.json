@@ -1,0 +1,9 @@
+{
+  "meta": { "schemaVersion": "1.0.0", "title": "unreachable ending" },
+  "entryNodeId": "n_start",
+  "nodes": [
+    { "id": "n_start", "type": "scene", "next": "n_loop", "data": { "text": "start" } },
+    { "id": "n_loop", "type": "jump", "data": { "to": "n_start" } },
+    { "id": "n_end", "type": "ending", "data": { "endingId": "end_c" } }
+  ]
+}

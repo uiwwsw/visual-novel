@@ -1,0 +1,7 @@
+{
+  "meta": { "schemaVersion": "1.0.0", "title": "no entry" },
+  "nodes": [
+    { "id": "n_a", "type": "scene", "next": "n_b", "data": { "text": "a" } },
+    { "id": "n_b", "type": "ending", "data": { "endingId": "end_b" } }
+  ]
+}

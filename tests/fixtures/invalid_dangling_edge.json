@@ -1,0 +1,6 @@
+{
+  "meta": { "schemaVersion": "1.0.0", "title": "dangling edge" },
+  "nodes": [
+    { "id": "n_start", "type": "scene", "next": "n_missing", "data": { "text": "hello" } }
+  ]
+}

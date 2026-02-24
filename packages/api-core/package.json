@@ -1,0 +1,13 @@
+{
+  "name": "@vn/api-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./errors": "./errors.js",
+    "./permissions": "./permissions.js",
+    "./routes": "./routes.js",
+    "./http": "./http.js"
+  }
+}

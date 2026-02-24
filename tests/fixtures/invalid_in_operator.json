@@ -1,0 +1,12 @@
+{
+  "meta": { "schemaVersion": "1.0.0", "title": "invalid in operator" },
+  "variables": [{ "key": "affection", "type": "number", "default": 0 }],
+  "nodes": [
+    {
+      "id": "n_gate",
+      "type": "condition",
+      "data": { "branches": [{ "when": "affection in 3", "to": "n_end" }] }
+    },
+    { "id": "n_end", "type": "ending", "data": { "endingId": "end_e" } }
+  ]
+}

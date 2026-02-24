@@ -1,0 +1,597 @@
+---
+const sampleScenario = {
+  meta: { title: "Sample VN", schemaVersion: "1.0.0" },
+  entryNodeId: "n_start",
+  nodes: [
+    {
+      id: "n_start",
+      type: "scene",
+      next: "n_choice",
+      data: { speaker: "나", text: "여기는 플레이어 화면이다." }
+    },
+    {
+      id: "n_choice",
+      type: "choice",
+      data: {
+        prompt: "어디로 이동할까?",
+        options: [
+          { id: "a", label: "옥상으로", to: "n_roof" },
+          { id: "b", label: "교실로", to: "n_class" }
+        ]
+      }
+    },
+    {
+      id: "n_roof",
+      type: "scene",
+      next: "n_end_1",
+      data: { speaker: "친구", text: "바람이 시원하다." }
+    },
+    {
+      id: "n_class",
+      type: "scene",
+      next: "n_end_2",
+      data: { speaker: "선생님", text: "수업을 시작하자." }
+    },
+    { id: "n_end_1", type: "ending", data: { title: "루프탑 엔딩" } },
+    { id: "n_end_2", type: "ending", data: { title: "클래스룸 엔딩" } }
+  ]
+};
+const studioApiBase = import.meta.env.PUBLIC_STUDIO_API_BASE_URL ?? "http://localhost:4321";
+---
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VN Player</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap");
+
+      :root {
+        --bg: #17142a;
+        --bg-deep: #0e1020;
+        --panel: #27224a;
+        --panel-soft: #312c5a;
+        --line: #9ec3ff;
+        --line-shadow: #3a5187;
+        --ink: #f4f8ff;
+        --muted: #9fb0d1;
+        --accent: #6dffb7;
+        --accent-2: #ffd66d;
+        --danger: #ff728f;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        font-family: "VT323", monospace;
+        font-size: 28px;
+        line-height: 1.2;
+        background:
+          radial-gradient(circle at 12% 10%, #3e3d87 0, transparent 40%),
+          radial-gradient(circle at 86% 0, #633f9f 0, transparent 35%),
+          linear-gradient(180deg, #1c1733 0%, #0f1325 100%);
+      }
+
+      .stage {
+        max-width: 1080px;
+        margin: 0 auto;
+        min-height: 100vh;
+        padding: 20px;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 14px;
+      }
+
+      .pixel-frame {
+        border: 3px solid var(--line);
+        box-shadow:
+          0 0 0 3px var(--line-shadow),
+          0 12px 0 rgba(0, 0, 0, 0.2);
+        background: linear-gradient(180deg, #31295a, #1f1a3b);
+      }
+
+      .hud {
+        padding: 14px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .hud-title {
+        font-family: "Press Start 2P", monospace;
+        font-size: 14px;
+        letter-spacing: 0.04em;
+        text-shadow: 2px 2px 0 #000;
+      }
+
+      .hud-meta {
+        color: var(--muted);
+        font-size: 24px;
+      }
+
+      .hud-badge {
+        border: 2px solid var(--accent);
+        background: rgba(18, 50, 55, 0.62);
+        color: var(--accent);
+        padding: 8px 12px;
+        font-size: 22px;
+      }
+
+      .scene {
+        padding: 16px;
+        display: grid;
+        grid-template-rows: 1fr auto;
+        gap: 12px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .scene::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+        background-size: 18px 18px;
+        opacity: 0.22;
+        pointer-events: none;
+      }
+
+      .scene-window {
+        position: relative;
+        z-index: 1;
+        border: 2px dashed rgba(158, 195, 255, 0.65);
+        padding: 12px;
+        background: rgba(15, 18, 37, 0.44);
+        min-height: 280px;
+      }
+
+      .character-sprite {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        z-index: 2;
+        width: min(36vw, 320px);
+        max-height: min(52vh, 420px);
+        object-fit: contain;
+        filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+        pointer-events: none;
+      }
+
+      .character-sprite.hidden {
+        display: none;
+      }
+
+      .node-meta {
+        font-family: "Press Start 2P", monospace;
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .dialog {
+        position: relative;
+        z-index: 1;
+        background: var(--panel);
+        border: 2px solid #d8e8ff;
+        box-shadow: inset 0 0 0 2px var(--line-shadow);
+        padding: 14px;
+      }
+
+      .speaker {
+        font-family: "Press Start 2P", monospace;
+        font-size: 12px;
+        color: var(--accent-2);
+        margin-bottom: 8px;
+      }
+
+      .text {
+        min-height: 86px;
+        color: var(--ink);
+      }
+
+      .choices {
+        margin-top: 10px;
+        display: grid;
+        gap: 8px;
+      }
+
+      button {
+        width: 100%;
+        border: 2px solid #dce9ff;
+        background: linear-gradient(180deg, #4c71ba, #3f5e98);
+        color: white;
+        cursor: pointer;
+        font: inherit;
+        font-size: 24px;
+        padding: 10px 12px;
+        text-align: left;
+        transition: transform 120ms steps(2), filter 120ms steps(2);
+      }
+
+      button:hover:not(:disabled) {
+        transform: translate(-1px, -1px);
+        filter: brightness(1.08);
+      }
+
+      button:disabled {
+        opacity: 0.42;
+        cursor: not-allowed;
+      }
+
+      .controls {
+        padding: 10px;
+        display: grid;
+        grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr 1fr;
+        gap: 8px;
+      }
+
+      .controls input {
+        width: 100%;
+        border: 2px solid #dce9ff;
+        background: #ecf5ff;
+        color: #1e2a45;
+        font: inherit;
+        font-size: 24px;
+        padding: 10px 12px;
+      }
+
+      .highlight {
+        border-color: #d9ffd9;
+        background: linear-gradient(180deg, #2ecb8b, #258e72);
+        color: #f5fff8;
+      }
+
+      .meta {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 22px;
+      }
+
+      @media (max-width: 840px) {
+        .stage {
+          padding: 12px;
+          gap: 10px;
+        }
+
+        .hud {
+          grid-template-columns: 1fr;
+        }
+
+        .controls {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .text {
+          min-height: 72px;
+        }
+      }
+
+      @media (max-width: 540px) {
+        body {
+          font-size: 24px;
+        }
+
+        .hud-title {
+          font-size: 12px;
+        }
+
+        .scene-window {
+          min-height: 220px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="stage">
+      <header class="pixel-frame hud">
+        <div>
+          <div class="hud-title" id="title"></div>
+          <div class="hud-meta">PIXEL STORY MODE</div>
+        </div>
+        <div class="hud-badge" id="nodeMeta"></div>
+      </header>
+
+      <section class="pixel-frame scene">
+        <div class="scene-window" id="sceneWindow"></div>
+        <img id="characterSprite" class="character-sprite hidden" alt="character" />
+        <div class="dialog">
+          <div class="speaker" id="speaker"></div>
+          <div class="text" id="text"></div>
+          <div class="choices" id="choices"></div>
+          <div class="meta" id="meta"></div>
+        </div>
+      </section>
+      <audio id="bgmPlayer" preload="auto" loop></audio>
+
+      <section class="pixel-frame controls">
+        <input id="projectRef" placeholder="project id or slug" />
+        <button id="fetchProjectBtn">프로젝트 불러오기</button>
+        <button id="nextBtn" class="highlight">다음</button>
+        <button id="restartBtn">처음으로</button>
+        <button id="saveBtn">퀵세이브</button>
+        <button id="loadBtn">로드</button>
+      </section>
+    </main>
+
+    <script type="module" define:vars={{ sampleScenario, studioApiBase }}>
+      const DEFAULT_TEXT_SPEED = 24;
+      const MAX_TEXT_SPEED = 96;
+
+      let scenario = structuredClone(sampleScenario);
+      let nodes = new Map(scenario.nodes.map((n) => [n.id, n]));
+      const state = {
+        currentId: scenario.entryNodeId,
+        saveSlot: null,
+        projectRef: null,
+        currentMusic: null,
+        typeTimer: null,
+        typeToken: 0,
+        typeText: "",
+        isTyping: false
+      };
+
+      const el = {
+        title: document.getElementById("title"),
+        nodeMeta: document.getElementById("nodeMeta"),
+        sceneWindow: document.getElementById("sceneWindow"),
+        characterSprite: document.getElementById("characterSprite"),
+        bgmPlayer: document.getElementById("bgmPlayer"),
+        speaker: document.getElementById("speaker"),
+        text: document.getElementById("text"),
+        choices: document.getElementById("choices"),
+        meta: document.getElementById("meta"),
+        projectRef: document.getElementById("projectRef"),
+        fetchProjectBtn: document.getElementById("fetchProjectBtn"),
+        nextBtn: document.getElementById("nextBtn"),
+        restartBtn: document.getElementById("restartBtn"),
+        saveBtn: document.getElementById("saveBtn"),
+        loadBtn: document.getElementById("loadBtn")
+      };
+
+      function resolveNodeTextSpeed(node) {
+        const raw = Number(node?.data?.textSpeed);
+        if (!Number.isFinite(raw)) {
+          return DEFAULT_TEXT_SPEED;
+        }
+        return Math.max(0, Math.min(MAX_TEXT_SPEED, Math.round(raw)));
+      }
+
+      function renderDialogText(text, speed = DEFAULT_TEXT_SPEED) {
+        const content = text || "";
+        state.typeToken += 1;
+        const currentToken = state.typeToken;
+        state.typeText = content;
+        state.isTyping = false;
+        if (state.typeTimer) {
+          clearTimeout(state.typeTimer);
+          state.typeTimer = null;
+        }
+
+        if (speed <= 0 || content.length === 0) {
+          el.text.textContent = content;
+          return;
+        }
+
+        let index = 0;
+        el.text.textContent = "";
+        state.isTyping = true;
+
+        const step = () => {
+          if (currentToken !== state.typeToken) {
+            return;
+          }
+          index += 1;
+          el.text.textContent = content.slice(0, index);
+          if (index >= content.length) {
+            state.isTyping = false;
+            state.typeTimer = null;
+            return;
+          }
+          state.typeTimer = window.setTimeout(step, speed);
+        };
+
+        state.typeTimer = window.setTimeout(step, speed);
+      }
+
+      function revealAllDialogText() {
+        if (!state.isTyping) {
+          return false;
+        }
+        state.typeToken += 1;
+        if (state.typeTimer) {
+          clearTimeout(state.typeTimer);
+          state.typeTimer = null;
+        }
+        state.isTyping = false;
+        el.text.textContent = state.typeText;
+        return true;
+      }
+
+      function setScenario(nextScenario) {
+        scenario = nextScenario;
+        nodes = new Map((scenario.nodes || []).map((n) => [n.id, n]));
+        state.currentId = scenario.entryNodeId;
+        state.currentMusic = null;
+        el.bgmPlayer.pause();
+        el.bgmPlayer.removeAttribute("src");
+        el.bgmPlayer.load();
+      }
+
+      function applyMusic(musicUrl) {
+        const nextMusic = musicUrl ? String(musicUrl).trim() : "";
+        if (!nextMusic) {
+          return;
+        }
+        if (state.currentMusic === nextMusic) {
+          return;
+        }
+        state.currentMusic = nextMusic;
+        el.bgmPlayer.src = nextMusic;
+        const playPromise = el.bgmPlayer.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {});
+        }
+      }
+
+      function readProjectRefFromUrl() {
+        const query = new URLSearchParams(window.location.search);
+        return query.get("project");
+      }
+
+      function updateProjectRefInUrl(projectRef) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("project", projectRef);
+        window.history.replaceState({}, "", url);
+      }
+
+      async function loadProject(projectRef) {
+        const ref = (projectRef || "").trim();
+        if (!ref) {
+          return;
+        }
+        const endpoint = `${studioApiBase}/api/player/projects/${encodeURIComponent(ref)}/scenario`;
+        try {
+          const response = await fetch(endpoint);
+          const body = await response.json();
+          if (!response.ok) {
+            throw new Error(body.message || body.code || "Failed to load project.");
+          }
+
+          if (!body.scenario?.entryNodeId || !Array.isArray(body.scenario?.nodes)) {
+            throw new Error("Invalid scenario payload.");
+          }
+
+          state.projectRef = ref;
+          setScenario(body.scenario);
+          el.projectRef.value = ref;
+          updateProjectRefInUrl(ref);
+          render();
+        } catch (error) {
+          el.sceneWindow.style.backgroundImage = "";
+          el.sceneWindow.style.backgroundSize = "";
+          el.sceneWindow.style.backgroundPosition = "";
+          el.characterSprite.classList.add("hidden");
+          el.characterSprite.removeAttribute("src");
+          el.speaker.textContent = "ERROR";
+          el.text.textContent = String(error.message || error);
+          el.choices.innerHTML = "";
+          el.meta.textContent = `failed to load: ${ref}`;
+          el.nextBtn.disabled = true;
+        }
+      }
+
+      function render() {
+        const node = nodes.get(state.currentId);
+        if (!node) {
+          el.sceneWindow.style.backgroundImage = "";
+          el.sceneWindow.style.backgroundSize = "";
+          el.sceneWindow.style.backgroundPosition = "";
+          el.characterSprite.classList.add("hidden");
+          el.characterSprite.removeAttribute("src");
+          el.speaker.textContent = "ERROR";
+          el.text.textContent = "현재 노드를 찾을 수 없습니다.";
+          el.choices.innerHTML = "";
+          el.meta.textContent = "invalid node";
+          el.nextBtn.disabled = true;
+          return;
+        }
+
+        el.title.textContent = scenario.meta?.title || "Untitled VN";
+        el.nodeMeta.textContent = `node: ${node.id} (${node.type})`;
+        el.choices.innerHTML = "";
+        const background = node.data?.background;
+        const characterImage = node.data?.characterImage;
+        const music = node.data?.music;
+        if (background) {
+          const safeUrl = String(background).replace(/"/g, "%22");
+          el.sceneWindow.style.backgroundImage = `linear-gradient(rgba(12, 16, 32, 0.34), rgba(12, 16, 32, 0.34)), url("${safeUrl}")`;
+          el.sceneWindow.style.backgroundSize = "cover";
+          el.sceneWindow.style.backgroundPosition = "center";
+        } else {
+          el.sceneWindow.style.backgroundImage = "";
+          el.sceneWindow.style.backgroundSize = "";
+          el.sceneWindow.style.backgroundPosition = "";
+        }
+        if (characterImage) {
+          el.characterSprite.src = String(characterImage);
+          el.characterSprite.classList.remove("hidden");
+        } else {
+          el.characterSprite.classList.add("hidden");
+          el.characterSprite.removeAttribute("src");
+        }
+        applyMusic(music);
+        const textSpeed = resolveNodeTextSpeed(node);
+
+        if (node.type === "scene") {
+          el.speaker.textContent = node.data?.speaker || "Narrator";
+          renderDialogText(node.data?.text || "", textSpeed);
+          el.nextBtn.disabled = !node.next;
+          el.nextBtn.onclick = () => {
+            if (revealAllDialogText()) {
+              return;
+            }
+            state.currentId = node.next;
+            render();
+          };
+        } else if (node.type === "choice") {
+          el.speaker.textContent = "Choice";
+          renderDialogText(node.data?.prompt || "선택", textSpeed);
+          el.nextBtn.disabled = true;
+          for (const option of node.data?.options || []) {
+            const button = document.createElement("button");
+            button.textContent = option.label;
+            button.onclick = () => {
+              state.currentId = option.to;
+              render();
+            };
+            el.choices.appendChild(button);
+          }
+        } else if (node.type === "ending") {
+          el.speaker.textContent = "ENDING";
+          renderDialogText(node.data?.title || "The End", textSpeed);
+          el.nextBtn.disabled = true;
+        } else {
+          el.speaker.textContent = node.type;
+          renderDialogText(JSON.stringify(node.data || {}), textSpeed);
+          el.nextBtn.disabled = true;
+        }
+
+        el.meta.textContent = `entry: ${scenario.entryNodeId} | schema: ${scenario.meta?.schemaVersion || "unknown"}${state.projectRef ? ` | project: ${state.projectRef}` : ""}`;
+      }
+
+      el.restartBtn.onclick = () => {
+        state.currentId = scenario.entryNodeId;
+        render();
+      };
+      el.saveBtn.onclick = () => {
+        state.saveSlot = { currentId: state.currentId };
+        localStorage.setItem("vn.quickSave", JSON.stringify(state.saveSlot));
+      };
+      el.loadBtn.onclick = () => {
+        const saved = state.saveSlot || JSON.parse(localStorage.getItem("vn.quickSave") || "null");
+        if (!saved) return;
+        state.currentId = saved.currentId;
+        render();
+      };
+      el.fetchProjectBtn.onclick = () => {
+        loadProject(el.projectRef.value);
+      };
+
+      const initialProjectRef = readProjectRefFromUrl();
+      if (initialProjectRef) {
+        el.projectRef.value = initialProjectRef;
+        loadProject(initialProjectRef);
+      } else {
+        render();
+      }
+    </script>
+  </body>
+</html>

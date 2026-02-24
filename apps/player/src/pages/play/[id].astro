@@ -1,0 +1,22 @@
+---
+export const prerender = false;
+
+const projectId = Astro.params.id ?? "";
+const projectRef = encodeURIComponent(projectId);
+const target = `/?project=${projectRef}`;
+---
+
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+    <title>Redirecting...</title>
+  </head>
+  <body>
+    <script is:inline>
+      location.replace({JSON.stringify(target)});
+    </script>
+    <p>Redirecting to project player...</p>
+  </body>
+</html>

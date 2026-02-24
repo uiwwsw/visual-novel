@@ -1,0 +1,20 @@
+{
+  "name": "visual-novel-platform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "ci:test": "node --test tests/*.test.js tests/**/*.test.js",
+    "check": "npm run ci:test",
+    "db:apply:sprint1": "./scripts/apply_sprint1_sql.sh",
+    "db:verify:rls": "./scripts/verify_sprint1_rls.sh"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

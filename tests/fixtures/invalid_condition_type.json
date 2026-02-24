@@ -1,0 +1,12 @@
+{
+  "meta": { "schemaVersion": "1.0.0", "title": "condition type mismatch" },
+  "variables": [{ "key": "affection", "type": "number", "default": 0 }],
+  "nodes": [
+    {
+      "id": "n_gate",
+      "type": "condition",
+      "data": { "branches": [{ "when": "\"3\" >= 2", "to": "n_end" }] }
+    },
+    { "id": "n_end", "type": "ending", "data": { "endingId": "end_a" } }
+  ]
+}
